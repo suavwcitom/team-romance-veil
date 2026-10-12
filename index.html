@@ -379,6 +379,7 @@ dialog input {
   </section>
 
   <section class="section" id="Reservations">
+    
     <div class="section-head">
       <div class="eyebrow">Find your muse</div>
       <h2>The reservation room</h2>
@@ -387,10 +388,48 @@ dialog input {
 
     <div class="filters">
       <input id="search" type="search" placeholder="♡ Buscar personaje...">
-      <select id="Grupo">
-        <option value="">Todos los grupos</option>
-        <option value="ENHYPEN">ENHYPEN</option>
-      </select>
+      
+        <select id="Fandom">
+  <option value="">Todos los grupos</option>
+  <option value="ENHYPEN">ENHYPEN</option>
+  <option value="TXT">TXT</option>
+  <option value="Stray Kids">Stray Kids</option>
+  <option value="ATEEZ">ATEEZ</option>
+  <option value="SEVENTEEN">SEVENTEEN</option>
+  <option value="RIIZE">RIIZE</option>
+  <option value="ZEROBASEONE">ZEROBASEONE (ZB1)</option>
+  <option value="BOYNEXTDOOR">BOYNEXTDOOR</option>
+  <option value="TWS">TWS</option>
+  <option value="TREASURE">TREASURE</option>
+  <option value="P1Harmony">P1Harmony</option>
+  <option value="NCT">NCT (NCT 127, NCT DREAM, WayV)</option>
+  <option value="EXO">EXO</option>
+  <option value="MONSTA X">MONSTA X</option>
+  <option value="GOT7">GOT7</option>
+  <option value="The Boyz">The Boyz</option>
+  <option value="BIGBANG">BIGBANG</option>
+  <option value="SHINee">SHINee</option>
+  <option value="Super Junior">Super Junior</option>
+  <option value="Day6">Day6</option>
+  <option value="NewJeans">NewJeans</option>
+  <option value="IVE">IVE</option>
+  <option value="LE SSERAFIM">LE SSERAFIM</option>
+  <option value="aespa">aespa</option>
+  <option value="BABYMONSTER">BABYMONSTER</option>
+  <option value="ILLIT">ILLIT</option>
+  <option value="KISS OF LIFE">KISS OF LIFE</option>
+  <option value="NMIXX">NMIXX</option>
+  <option value="BLACKPINK">BLACKPINK</option>
+  <option value="TWICE">TWICE</option>
+  <option value="Red Velvet">Red Velvet</option>
+  <option value="ITZY">ITZY</option>
+  <option value="(G)I-DLE">(G)I-DLE</option>
+  <option value="MAMAMOO">MAMAMOO</option>
+  <option value="STAYC">STAYC</option>
+  <option value="Girls' Generation">Girls' Generation (SNSD)</option>
+  <option value="2NE1">2NE1</option>
+  <option value="CORTIS">CORTIS</option>
+        </select>
       <select id="availability">
         <option value="">Todos los estados</option>
         <option value="available">Disponibles</option>
@@ -503,7 +542,7 @@ dialog input {
 <script>
 const cards = [...document.querySelectorAll('.card')];
 const search = document.getElementById('search');
-const fandom = document.getElementById('fandom');
+const fandom = document.getElementById('Fandom');
 const availability = document.getElementById('availability');
 const dialog = document.getElementById('reserveDialog');
 const chosen = document.getElementById('chosenCharacter');
