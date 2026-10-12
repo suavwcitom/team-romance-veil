@@ -438,64 +438,7 @@ dialog input {
     </div>
 
     <div class="grid" id="characterGrid">
-      <article class="card" data-name="jay" data-fandom="ENHYPEN" data-status="available">
-        <div class="card-art">J<span>01 / EN-</span></div>
-        <div class="card-info">
-          <h3>Jay</h3><div class="fandom">ENHYPEN · PARK JONGSEONG</div>
-          <span class="status">♡ Available</span>
-          <button class="reserve-btn" data-character="Jay">RESERVE ♡</button>
-        </div>
-      </article>
 
-      <article class="card" data-name="sunoo" data-fandom="ENHYPEN" data-status="available">
-        <div class="card-art">S<span>02 / EN-</span></div>
-        <div class="card-info">
-          <h3>Sunoo</h3><div class="fandom">ENHYPEN · KIM SUNOO</div>
-          <span class="status">♡ Available</span>
-          <button class="reserve-btn" data-character="Sunoo">RESERVE ♡</button>
-        </div>
-      </article>
-
-      <article class="card" data-name="jungwon" data-fandom="ENHYPEN" data-status="available">
-        <div class="card-art">J<span>03 / EN-</span></div>
-        <div class="card-info">
-          <h3>Jungwon</h3><div class="fandom">ENHYPEN · YANG JUNGWON</div>
-          <span class="status">♡ Available</span>
-          <button class="reserve-btn" data-character="Jungwon">RESERVE ♡</button>
-        </div>
-      </article>
-
-      <article class="card" data-name="heeseung" data-fandom="ENHYPEN" data-status="available">
-        <div class="card-art">H<span>04 / EN-</span></div>
-        <div class="card-info">
-          <h3>Heeseung</h3><div class="fandom">ENHYPEN · LEE HEESEUNG</div>
-          <span class="status">♡ Available</span>
-          <button class="reserve-btn" data-character="Heeseung">RESERVE ♡</button>
-        </div>
-      </article>
-
-      <article class="card" data-name="jake" data-fandom="ENHYPEN" data-status="available">
-        <div class="card-art">J<span>05 / EN-</span></div>
-        <div class="card-info">
-          <h3>Jake</h3><div class="fandom">ENHYPEN · SIM JAEYUN</div>
-          <span class="status">♡ Available</span>
-          <button class="reserve-btn" data-character="Jake">RESERVE ♡</button>
-        </div>
-      </article>
-
-      <article class="card" data-name="sunghoon" data-fandom="ENHYPEN" data-status="available">
-        <div class="card-art">S<span>06 / EN-</span></div>
-        <div class="card-info">
-          <h3>Sunghoon</h3><div class="fandom">ENHYPEN · PARK SUNGHOON</div>
-          <span class="status">♡ Available</span>
-          <button class="reserve-btn" data-character="Sunghoon">RESERVE ♡</button>
-        </div>
-      </article>
-
-      <article class="card" data-name="ni-ki" data-fandom="ENHYPEN" data-status="available">
-        <div class="card-art">N<span>07 / EN-</span></div>
-        <div class="card-info">
-          <h3>Ni-ki</h3><div class="fandom">ENHYPEN · NISHIMURA RIKI</div>
           <span class="status">♡ Available</span>
           <button class="reserve-btn" data-character="Ni-ki">RESERVE ♡</button>
         </div>
@@ -529,7 +472,7 @@ dialog input {
     <input id="nickname" name="nickname" maxlength="40" required placeholder="¿Cómo te llamás?">
 
     <label for="Number">Tu número de contacto</label>
-    <input id="Number" name="Number" maxlength="80" required placeholder="@tuusuario">
+    <input id="Number" name="Number" maxlength="80" required placeholder="+ *****">
 
     <div class="form-actions">
       <button class="main-btn" type="submit">SOLICITAR ♡</button>
@@ -540,55 +483,128 @@ dialog input {
 </dialog>
 
 <script>
-const cards = [...document.querySelectorAll('.card')];
+const characterGrid = document.getElementById('characterGrid');
 const search = document.getElementById('search');
 const fandom = document.getElementById('Fandom');
 const availability = document.getElementById('availability');
 const dialog = document.getElementById('reserveDialog');
 const chosen = document.getElementById('chosenCharacter');
 const feedback = document.getElementById('feedback');
+const empty = document.getElementById('empty');
+
 let selectedCharacter = '';
 
-function filterCards() {
-  const term = search.value.toLowerCase().trim();
-  let shown = 0;
+const groups = {
+'ENHYPEN': ['Jungwon', 'Heeseung', 'Jay', 'Jake', 'Sunghoon', 'Sunoo', 'Ni-ki'],
+'TXT': ['Soobin', 'Yeonjun', 'Beomgyu', 'Taehyun', 'Huening Kai'],
+'Stray Kids': ['Bang Chan', 'Lee Know', 'Changbin', 'Hyunjin', 'Han', 'Felix', 'Seungmin', 'I.N'],
+'ATEEZ': ['Hongjoong', 'Seonghwa', 'Yunho', 'Yeosang', 'San', 'Mingi', 'Wooyoung', 'Jongho'],
+'SEVENTEEN': ['S.Coups', 'Jeonghan', 'Joshua', 'Jun', 'Hoshi', 'Wonwoo', 'Woozi', 'DK', 'Mingyu', 'The8', 'Seungkwan', 'Vernon', 'Dino'],
+'RIIZE': ['Shotaro', 'Eunseok', 'Sungchan', 'Wonbin', 'Sohee', 'Anton'],
+'ZEROBASEONE': ['Sung Hanbin', 'Kim Jiwoong', 'Zhang Hao', 'Seok Matthew', 'Kim Taerae', 'Ricky', 'Kim Gyuvin', 'Park Gunwook', 'Han Yujin'],
+'BOYNEXTDOOR': ['Sungho', 'Riwoo', 'Jaehyun', 'Taesan', 'Leehan', 'Woonhak'],
+'TWS': ['Shinyu', 'Dohoon', 'Youngjae', 'Hanjin', 'Jihoon', 'Kyungmin'],
+'TREASURE': ['Choi Hyunsuk', 'Jihoon', 'Yoshi', 'Junkyu', 'Mashiho', 'Jaehyuk', 'Asahi', 'Yedam', 'Doyoung', 'Haruto', 'Jeongwoo', 'Junghwan'],
+'P1Harmony': ['Keeho', 'Theo', 'Jiung', 'Intak', 'Soul', 'Jongseob'],
+'NCT': ['Johnny', 'Taeyong', 'Yuta', 'Kun', 'Doyoung', 'Ten', 'Jaehyun', 'Winwin', 'Jungwoo', 'Mark', 'Xiaojun', 'Hendery', 'Renjun', 'Jeno', 'Haechan', 'Jaemin', 'Yangyang', 'Shotaro', 'Sungchan', 'Chenle', 'Jisung', 'Sion', 'Riku', 'Yushi', 'Jaehee', 'Ryo', 'Sakuya'],
+'EXO': ['Xiumin', 'Suho', 'Lay', 'Baekhyun', 'Chen', 'Chanyeol', 'D.O.', 'Kai', 'Sehun'],
+'MONSTA X': ['Shownu', 'Minhyuk', 'Kihyun', 'Hyungwon', 'Joohoney', 'I.M'],
+'GOT7': ['Jay B', 'Mark', 'Jackson', 'Jinyoung', 'Youngjae', 'BamBam', 'Yugyeom'],
+'The Boyz': ['Sangyeon', 'Jacob', 'Younghoon', 'Hyunjae', 'Juyeon', 'Kevin', 'New', 'Q', 'Sunwoo', 'Eric'],
+'BIGBANG': ['G-Dragon', 'Taeyang', 'Daesung', 'T.O.P'],
+'SHINee': ['Onew', 'Key', 'Minho', 'Taemin', 'Jonghyun'],
+'Super Junior': ['Leeteuk', 'Heechul', 'Yesung', 'Shindong', 'Eunhyuk', 'Siwon', 'Donghae', 'Ryeowook', 'Kyuhyun'],
+'Day6': ['Sungjin', 'Young K', 'Wonpil', 'Dowoon'],
+'NewJeans': ['Minji', 'Hanni', 'Danielle', 'Haerin', 'Hyein'],
+'IVE': ['Yujin', 'Gaeul', 'Rei', 'Wonyoung', 'Liz', 'Leeseo'],
+'LE SSERAFIM': ['Sakura', 'Kim Chaewon', 'Huh Yunjin', 'Kazuha', 'Hong Eunchae'],
+'aespa': ['Karina', 'Giselle', 'Winter', 'Ningning'],
+'BABYMONSTER': ['Ruka', 'Pharita', 'Asa', 'Ahyeon', 'Rami', 'Rora', 'Chiquita'],
+'ILLIT': ['Yunah', 'Minju', 'Moka', 'Wonhee', 'Iroha'],
+'KISS OF LIFE': ['Julie', 'Natty', 'Belle', 'Haneul'],
+'NMIXX': ['Lily', 'Haewon', 'Sullyoon', 'Bae', 'Jiwoo', 'Kyujin'],
+'BLACKPINK': ['Jisoo', 'Jennie', 'Rosé', 'Lisa'],
+'TWICE': ['Nayeon', 'Jeongyeon', 'Momo', 'Sana', 'Jihyo', 'Mina', 'Dahyun', 'Chaeyoung', 'Tzuyu'],
+'Red Velvet': ['Irene', 'Seulgi', 'Wendy', 'Joy', 'Yeri'],
+'ITZY': ['Yeji', 'Lia', 'Ryujin', 'Chaeryeong', 'Yuna'],
+'(G)I-DLE': ['Miyeon', 'Minnie', 'Soyeon', 'Yuqi', 'Shuhua'],
+'MAMAMOO': ['Solar', 'Moonbyul', 'Wheein', 'Hwasa'],
+'STAYC': ['Sumin', 'Sieun', 'Isa', 'Seeun', 'Yoon', 'J'],
+"Girls' Generation": ['Taeyeon', 'Sunny', 'Tiffany', 'Hyoyeon', 'Yuri', 'Sooyoung', 'Yoona', 'Seohyun'],
+'2NE1': ['CL', 'Bom', 'Dara', 'Minzy'],
+'CORTIS': ['Martin', 'James', 'Juhoon', 'Seonghyeon', 'Keonho']
+};
 
-  cards.forEach(card => {
-    const matchesName = card.dataset.name.includes(term);
-    const matchesFandom = !fandom.value || card.dataset.fandom === fandom.value;
-    const matchesStatus = !availability.value || card.dataset.status === availability.value;
-    const visible = matchesName && matchesFandom && matchesStatus;
-    card.style.display = visible ? '' : 'none';
-    if (visible) shown++;
-  });
+function renderCards() {
+const selectedGroup = fandom.value;
+const term = search.value.toLowerCase().trim();
+const statusFilter = availability.value;
 
-  document.getElementById('empty').style.display = shown ? 'none' : 'block';
+const entries = Object.entries(groups)
+.filter(([group]) => !selectedGroup || group === selectedGroup)
+.flatMap(([group, members]) =>
+members.map((name, index) => ({ name, group, index }))
+)
+.filter(({ name }) => name.toLowerCase().includes(term));
+
+characterGrid.querySelectorAll('.card').forEach(card => card.remove());
+
+entries.forEach(({ name, group, index }) => {
+const card = document.createElement('article');
+card.className = 'card';
+card.dataset.name = name.toLowerCase();
+card.dataset.fandom = group;
+card.dataset.status = 'available';
+
+card.innerHTML = `
+  <div class="card-art">${name.charAt(0)}
+    <span>${String(index + 1).padStart(2, '0')} / ${group}</span>
+  </div>
+  <div class="card-info">
+    <h3>${name}</h3>
+    <div class="fandom">${group}</div>
+    <span class="status">♡ Available</span>
+    <button class="reserve-btn" data-character="${name}" data-group="${group}">RESERVE ♡</button>
+  </div>
+`;
+
+if (!statusFilter || statusFilter === 'available') {
+  characterGrid.insertBefore(card, empty);
 }
 
-search.addEventListener('input', filterCards);
-fandom.addEventListener('change', filterCards);
-availability.addEventListener('change', filterCards);
+});
 
-document.querySelectorAll('.reserve-btn').forEach(button => {
-  button.addEventListener('click', () => {
-    selectedCharacter = button.dataset.character;
-    chosen.textContent = 'Personaje elegido: ' + selectedCharacter;
-    feedback.textContent = '';
-    dialog.showModal();
-  });
+empty.style.display =
+characterGrid.querySelectorAll('.card').length ? 'none' : 'block';
+}
+
+search.addEventListener('input', renderCards);
+fandom.addEventListener('change', renderCards);
+availability.addEventListener('change', renderCards);
+
+characterGrid.addEventListener('click', event => {
+const button = event.target.closest('.reserve-btn');
+if (!button) return;
+
+selectedCharacter = button.dataset.character;
+chosen.textContent = "Personaje elegido: ${selectedCharacter} · ${button.dataset.group}";
+feedback.textContent = '';
+dialog.showModal();
 });
 
 document.getElementById('cancelBtn').addEventListener('click', () => dialog.close());
 
 dialog.addEventListener('click', event => {
-  if (event.target === dialog) dialog.close();
+if (event.target === dialog) dialog.close();
 });
 
 document.getElementById('reserveForm').addEventListener('submit', event => {
-  event.preventDefault();
-  feedback.textContent =
-    '¡Formulario probado con éxito! ♡ Todavía falta conectar la base de datos para enviar la solicitud de verdad.';
+event.preventDefault();
+feedback.textContent =
+'¡Formulario probado con éxito! ♡ Todavía falta conectar la base de datos para enviar la solicitud de verdad.';
 });
+
+renderCards();
 </script>
 </body>
     </html>
