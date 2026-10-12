@@ -464,6 +464,18 @@ dialog input {
   <h2>Reserve your character ♡</h2>
   <p id="chosenCharacter"></p>
   <form id="reserveForm">
+
+    <div id="otherPersonField" hidden>
+      <label for="otherPersonName">Nombre de la persona occidental</label>
+      <input
+        id="otherPersonName"
+        name="otherPersonName"
+        maxlength="100"
+        placeholder="¡Escribe tu carita occidental, influencer, etc aquí!"
+      >
+      <p id="otherPersonStatus" aria-live="polite"></p>
+    </div>
+
     <label for="nickname">Tu nombre o nickname</label>
     <input id="nickname" name="nickname" maxlength="40" required placeholder="¿Cómo te llamás?">
 
