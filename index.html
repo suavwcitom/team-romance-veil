@@ -1,0 +1,557 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROMANCE VEIL — Reservations</title>
+<meta name="theme-color" content="#f8eeeb">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap');
+
+:root {
+  --red: #a52f48;
+  --dark: #71253a;
+  --pink: #f2d8dc;
+  --pale: #fbf2ef;
+  --cream: #fffaf5;
+  --text: #492d34;
+  --muted: #987b80;
+  --line: #ead5d7;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--pale);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+}
+
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+
+.topbar {
+  padding: 15px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  font-family: 'Playfair Display', serif;
+  color: var(--red);
+  font-size: 23px;
+  letter-spacing: 2px;
+}
+
+.brand small {
+  display: block;
+  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 4px;
+  margin-top: 3px;
+}
+
+nav { display: flex; gap: 22px; }
+nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 12px;
+}
+nav a:hover { color: var(--red); }
+
+.hero {
+  padding: 65px 20px 55px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 15% 20%, #f4dadd 0, transparent 35%),
+    radial-gradient(ellipse at 85% 75%, #f1d5d9 0, transparent 35%),
+    var(--cream);
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-size: 10px;
+  color: var(--red);
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(42px, 8vw, 76px);
+  font-weight: 500;
+  letter-spacing: 1px;
+  line-height: 1.08;
+  margin: 18px 0;
+}
+
+.hero h1 em { color: var(--red); font-weight: 500; }
+
+.hero p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+  max-width: 420px;
+  margin: 0 auto 26px;
+}
+
+.main-btn {
+  display: inline-block;
+  border: 0;
+  border-radius: 3px;
+  background: var(--red);
+  color: white;
+  padding: 13px 25px;
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 1px;
+  transition: .2s;
+}
+
+.main-btn:hover { background: var(--dark); }
+
+.ornament {
+  color: var(--red);
+  font-size: 21px;
+  margin: 18px 0;
+}
+
+.section {
+  max-width: 1050px;
+  margin: auto;
+  padding: 55px 22px;
+}
+
+.section-head { text-align: center; margin-bottom: 30px; }
+
+.section-head h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
+  font-weight: 500;
+  margin: 10px 0;
+}
+
+.section-head p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.filters input, .filters select {
+  min-width: 0;
+  flex: 1;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 12px;
+  color: var(--text);
+  outline-color: var(--red);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.card {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  padding: 12px;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px #71253a10;
+}
+
+.card-art {
+  height: 155px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #f4dfe0, #f9eeea);
+  color: var(--red);
+  font-family: 'Playfair Display', serif;
+  font-size: 43px;
+  position: relative;
+}
+
+.card-art span {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.card-info { padding: 15px 4px 4px; }
+
+.card-info h3 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: 21px;
+  margin: 0 0 5px;
+}
+
+.fandom {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 13px;
+}
+
+.status {
+  display: inline-block;
+  font-size: 9px;
+  padding: 5px 8px;
+  border-radius: 2px;
+  background: #e7efe3;
+  color: #4d7049;
+  margin-bottom: 13px;
+}
+
+.status.taken {
+  background: #f4dfe1;
+  color: var(--red);
+}
+
+.reserve-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.reserve-btn:hover { background: var(--red); color: white; }
+.reserve-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.empty {
+  display: none;
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  padding: 35px 10px;
+}
+
+.rules {
+  background: #f2dfe0;
+  text-align: center;
+  padding: 35px 22px;
+}
+
+.rules h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.rules p {
+  max-width: 510px;
+  margin: auto;
+  color: #805a61;
+  font-size: 12px;
+  line-height: 2;
+}
+
+footer {
+  background: var(--cream);
+  text-align: center;
+  padding: 25px 15px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+dialog {
+  border: 1px solid var(--line);
+  background: var(--cream);
+  color: var(--text);
+  padding: 25px;
+  width: min(420px, calc(100% - 30px));
+  border-radius: 4px;
+}
+
+dialog::backdrop { background: #38172088; }
+
+dialog h2 {
+  font-family: 'Playfair Display', serif;
+  color: var(--red);
+  font-weight: 500;
+}
+
+dialog label {
+  display: block;
+  font-size: 11px;
+  margin: 14px 0 6px;
+}
+
+dialog input {
+  width: 100%;
+  padding: 11px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.form-actions button { flex: 1; }
+.cancel {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+#feedback {
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 12px;
+}
+
+@media (max-width: 650px) {
+  .topbar { padding: 14px 5%; }
+  .brand { font-size: 19px; }
+  nav { gap: 12px; }
+  nav a { font-size: 10px; }
+  .hero { padding: 52px 18px 45px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .card { padding: 8px; }
+  .card-art { height: 120px; }
+  .card-info h3 { font-size: 18px; }
+  .section { padding: 42px 13px; }
+  .section-head h2 { font-size: 29px; }
+}
+
+@media (max-width: 360px) {
+  .topbar { align-items: flex-start; flex-direction: column; }
+  .grid { grid-template-columns: 1fr; }
+  .card-art { height: 145px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="#" class="brand" style="text-decoration:none">
+    ROMANCE VEIL
+    <small>♡ CHARACTER RESERVATIONS ♡</small>
+  </a>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#reservations">Reservations</a>
+    <a href="#rules">Rules</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" id="home">
+    <div class="eyebrow">♡ A little place for your favorite idols ♡</div>
+    <h1>Love is in<br>the <em>details.</em></h1>
+    <p>
+      Un pequeño universo creado para reservar a tus personajes favoritos.
+      Elegí tu lugar, dejá tu huella y escribí tu propia historia.
+    </p>
+    <a class="main-btn" href="#reservations">EXPLORE CHARACTERS ♡</a>
+    <div class="ornament">୨୧ · · · ♡ · · · ୨୧</div>
+  </section>
+
+  <section class="section" id="reservations">
+    <div class="section-head">
+      <div class="eyebrow">Find your muse</div>
+      <h2>The reservation room</h2>
+      <p>Buscá tu idol favorito y descubrí si todavía está disponible.</p>
+    </div>
+
+    <div class="filters">
+      <input id="search" type="search" placeholder="♡ Buscar personaje...">
+      <select id="fandom">
+        <option value="">Todos los fandoms</option>
+        <option value="ENHYPEN">ENHYPEN</option>
+      </select>
+      <select id="availability">
+        <option value="">Todos los estados</option>
+        <option value="available">Disponibles</option>
+        <option value="taken">Reservados</option>
+      </select>
+    </div>
+
+    <div class="grid" id="characterGrid">
+      <article class="card" data-name="jay" data-fandom="ENHYPEN" data-status="available">
+        <div class="card-art">J<span>01 / EN-</span></div>
+        <div class="card-info">
+          <h3>Jay</h3><div class="fandom">ENHYPEN · PARK JONGSEONG</div>
+          <span class="status">♡ Available</span>
+          <button class="reserve-btn" data-character="Jay">RESERVE ♡</button>
+        </div>
+      </article>
+
+      <article class="card" data-name="sunoo" data-fandom="ENHYPEN" data-status="available">
+        <div class="card-art">S<span>02 / EN-</span></div>
+        <div class="card-info">
+          <h3>Sunoo</h3><div class="fandom">ENHYPEN · KIM SUNOO</div>
+          <span class="status">♡ Available</span>
+          <button class="reserve-btn" data-character="Sunoo">RESERVE ♡</button>
+        </div>
+      </article>
+
+      <article class="card" data-name="jungwon" data-fandom="ENHYPEN" data-status="available">
+        <div class="card-art">J<span>03 / EN-</span></div>
+        <div class="card-info">
+          <h3>Jungwon</h3><div class="fandom">ENHYPEN · YANG JUNGWON</div>
+          <span class="status">♡ Available</span>
+          <button class="reserve-btn" data-character="Jungwon">RESERVE ♡</button>
+        </div>
+      </article>
+
+      <article class="card" data-name="heeseung" data-fandom="ENHYPEN" data-status="available">
+        <div class="card-art">H<span>04 / EN-</span></div>
+        <div class="card-info">
+          <h3>Heeseung</h3><div class="fandom">ENHYPEN · LEE HEESEUNG</div>
+          <span class="status">♡ Available</span>
+          <button class="reserve-btn" data-character="Heeseung">RESERVE ♡</button>
+        </div>
+      </article>
+
+      <article class="card" data-name="jake" data-fandom="ENHYPEN" data-status="available">
+        <div class="card-art">J<span>05 / EN-</span></div>
+        <div class="card-info">
+          <h3>Jake</h3><div class="fandom">ENHYPEN · SIM JAEYUN</div>
+          <span class="status">♡ Available</span>
+          <button class="reserve-btn" data-character="Jake">RESERVE ♡</button>
+        </div>
+      </article>
+
+      <article class="card" data-name="sunghoon" data-fandom="ENHYPEN" data-status="available">
+        <div class="card-art">S<span>06 / EN-</span></div>
+        <div class="card-info">
+          <h3>Sunghoon</h3><div class="fandom">ENHYPEN · PARK SUNGHOON</div>
+          <span class="status">♡ Available</span>
+          <button class="reserve-btn" data-character="Sunghoon">RESERVE ♡</button>
+        </div>
+      </article>
+
+      <article class="card" data-name="ni-ki" data-fandom="ENHYPEN" data-status="available">
+        <div class="card-art">N<span>07 / EN-</span></div>
+        <div class="card-info">
+          <h3>Ni-ki</h3><div class="fandom">ENHYPEN · NISHIMURA RIKI</div>
+          <span class="status">♡ Available</span>
+          <button class="reserve-btn" data-character="Ni-ki">RESERVE ♡</button>
+        </div>
+      </article>
+
+      <div class="empty" id="empty">No encontramos personajes con esa búsqueda. ♡</div>
+    </div>
+  </section>
+
+  <section class="rules" id="rules">
+    <div class="eyebrow">Before you reserve</div>
+    <h2>A little note for you ♡</h2>
+    <p>
+      Revisá la disponibilidad antes de solicitar una reserva.
+      Por ahora, esta es una vista previa del diseño: las reservas todavía
+      no se guardan en una base de datos compartida.
+    </p>
+  </section>
+</main>
+
+<footer>
+  ROMANCE VEIL ♡ MADE WITH LOVE
+</footer>
+
+<dialog id="reserveDialog">
+  <div class="eyebrow">A new little story</div>
+  <h2>Reserve your character ♡</h2>
+  <p id="chosenCharacter"></p>
+  <form id="reserveForm">
+    <label for="nickname">Tu nombre o nickname</label>
+    <input id="nickname" name="nickname" maxlength="40" required placeholder="¿Cómo te llamás?">
+
+    <label for="contact">Tu usuario de contacto</label>
+    <input id="contact" name="contact" maxlength="80" required placeholder="@tuusuario">
+
+    <div class="form-actions">
+      <button class="main-btn" type="submit">SOLICITAR ♡</button>
+      <button class="cancel" type="button" id="cancelBtn">CANCELAR</button>
+    </div>
+    <p id="feedback" aria-live="polite"></p>
+  </form>
+</dialog>
+
+<script>
+const cards = [...document.querySelectorAll('.card')];
+const search = document.getElementById('search');
+const fandom = document.getElementById('fandom');
+const availability = document.getElementById('availability');
+const dialog = document.getElementById('reserveDialog');
+const chosen = document.getElementById('chosenCharacter');
+const feedback = document.getElementById('feedback');
+let selectedCharacter = '';
+
+function filterCards() {
+  const term = search.value.toLowerCase().trim();
+  let shown = 0;
+
+  cards.forEach(card => {
+    const matchesName = card.dataset.name.includes(term);
+    const matchesFandom = !fandom.value || card.dataset.fandom === fandom.value;
+    const matchesStatus = !availability.value || card.dataset.status === availability.value;
+    const visible = matchesName && matchesFandom && matchesStatus;
+    card.style.display = visible ? '' : 'none';
+    if (visible) shown++;
+  });
+
+  document.getElementById('empty').style.display = shown ? 'none' : 'block';
+}
+
+search.addEventListener('input', filterCards);
+fandom.addEventListener('change', filterCards);
+availability.addEventListener('change', filterCards);
+
+document.querySelectorAll('.reserve-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    selectedCharacter = button.dataset.character;
+    chosen.textContent = 'Personaje elegido: ' + selectedCharacter;
+    feedback.textContent = '';
+    dialog.showModal();
+  });
+});
+
+document.getElementById('cancelBtn').addEventListener('click', () => dialog.close());
+
+dialog.addEventListener('click', event => {
+  if (event.target === dialog) dialog.close();
+});
+
+document.getElementById('reserveForm').addEventListener('submit', event => {
+  event.preventDefault();
+  feedback.textContent =
+    '¡Formulario probado con éxito! ♡ Todavía falta conectar la base de datos para enviar la solicitud de verdad.';
+});
+</script>
+</body>
+    </html>
+        
