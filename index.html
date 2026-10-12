@@ -583,7 +583,7 @@ const button = event.target.closest('.reserve-btn');
 if (!button) return;
 
 selectedCharacter = button.dataset.character;
-chosen.textContent = "Personaje elegido: ${selectedCharacter} · ${button.dataset.group}";
+chosen.textContent = `Personaje elegido: ${selectedCharacter} · ${button.dataset.group}`;
 feedback.textContent = '';
 dialog.showModal();
 });
