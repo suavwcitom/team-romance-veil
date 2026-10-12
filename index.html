@@ -597,6 +597,18 @@ if (!button) return;
 selectedCharacter = button.dataset.character;
 chosen.textContent = `Personaje elegido: ${selectedCharacter} · ${button.dataset.group}`;
 feedback.textContent = '';
+
+const otherField = document.getElementById('otherPersonField');
+const otherInput = document.getElementById('otherPersonName');
+const otherStatus = document.getElementById('otherPersonStatus');
+
+const isOther = button.dataset.character === 'Otro';
+
+otherField.hidden = !isOther;
+otherInput.required = isOther;
+otherInput.value = '';
+otherStatus.textContent = '';
+
 dialog.showModal();
 });
 
