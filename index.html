@@ -745,19 +745,33 @@ const reservedNames = new Set([
 
 
 
-  const entries = Object.entries(groups)
-    .filter(([group]) => !selectedGroup || group === selectedGroup)
-    .flatMap(([group, members]) =>
-      members.map((name, index) => ({ name, group, index }))
-    )
-    .filter(({ name }) => name.toLowerCase().includes(term))
-    .map(entry => ({
-      ...entry,
-      status: reservedNames.has(entry.name.toLowerCase().trim())
-        ? 'taken'
-        : 'available'
-    }))
-    .filter(({ status }) => !statusFilter || status === statusFilter);
+  
+const idolEntries = Object.entries(groups)
+  .filter(([group]) => !selectedGroup || group === selectedGroup)
+  .flatMap(([group, members]) =>
+    members.map((name, index) => ({ name, group, index }))
+  )
+  .filter(({name}) => name.toLowerCase().includes(term));
+
+const otherEntries = !selectedGroup
+  ? (otherReservations || [])
+      .map((row, index) => ({
+        name: row.person_name,
+        group: 'Occidentales / Otro',
+        index
+      }))
+      .filter(({name}) => name.toLowerCase().includes(term))
+  : [];
+
+const entries = [...idolEntries, ...otherEntries]
+  .map(entry => ({
+    ...entry,
+    status: reservedNames.has(entry.name.toLowerCase().trim())
+      ? 'taken'
+      : 'available'
+  }))
+  .filter(({status}) => !statusFilter || status === statusFilter);
+
 
   characterGrid.querySelectorAll('.card').forEach(card => card.remove());
 
