@@ -73,6 +73,38 @@
     <button id="logout">Cerrar sesión</button>
 
     <section class="panel">
+      <h2>♡ Roles ocupados oficialmente</h2>
+      <p class="muted">
+        Agregá los roles que ya están siendo utilizados oficialmente.
+      </p>
+
+      <form id="officialRoleForm">
+        <input
+          id="officialRoleName"
+          type="text"
+          placeholder="Nombre del rol (ej. Sunoo)"
+          maxlength="100"
+          required
+        >
+
+        <input
+          id="officialRoleFandom"
+          type="text"
+          placeholder="Grupo o fandom (ej. ENHYPEN)"
+          maxlength="100"
+          required
+        >
+
+        <button id="addOfficialRoleButton" type="submit">
+          Agregar rol ocupado ♡
+        </button>
+      </form>
+
+      <div id="officialRolesList">Cargando roles...</div>
+    </section>
+
+
+    <section class="panel">
       <h2>Reservas de idols</h2>
       <div id="idolList">Cargando...</div>
     </section>
@@ -97,6 +129,101 @@
 
   const $ = id => document.getElementById(id);
   let busy = false;
+
+  async function loadOfficialRoles() {
+    const container = $('officialRolesList');
+    container.textContent = 'Cargando roles...';
+
+    const { data, error } = await db
+      .from('official_roles')
+      .select('id, character_name, fandom, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      container.textContent = 'No se pudieron cargar los roles ocupados.';
+      status('Error al cargar roles: ' + error.message);
+      return;
+    }
+
+    container.replaceChildren();
+
+    if (!data || data.length === 0) {
+      addText(container, 'p', 'Todavía no hay roles ocupados.');
+      return;
+    }
+
+    data.forEach(role => {
+      const card = document.createElement('article');
+      card.className = 'reservation';
+
+      addText(card, 'h3', role.character_name);
+      addText(card, 'p', 'Fandom: ' + role.fandom);
+
+      const del = document.createElement('button');
+      del.className = 'delete';
+      del.textContent = 'Eliminar rol';
+
+      del.addEventListener('click', async () => {
+        if (!confirm('¿Querés eliminar este rol ocupado?')) return;
+
+        del.disabled = true;
+
+        const { error: deleteError } = await db
+          .from('official_roles')
+          .delete()
+          .eq('id', role.id);
+
+        if (deleteError) {
+          status('No se pudo eliminar: ' + deleteError.message);
+          del.disabled = false;
+          return;
+        }
+
+        status('Rol ocupado eliminado ♡');
+        await loadOfficialRoles();
+      });
+
+      card.appendChild(del);
+      container.appendChild(card);
+    });
+  }
+
+  $('officialRoleForm').addEventListener('submit', async event => {
+    event.preventDefault();
+
+    const characterName = $('officialRoleName').value.trim();
+    const fandom = $('officialRoleFandom').value.trim();
+    const button = $('addOfficialRoleButton');
+
+    if (!characterName || !fandom) {
+      status('Completá el nombre del rol y el fandom.');
+      return;
+    }
+
+    button.disabled = true;
+    status('Guardando rol ocupado...');
+
+    const { error } = await db
+      .from('official_roles')
+      .insert([{
+        character_name: characterName,
+        fandom: fandom
+      }]);
+
+    button.disabled = false;
+
+    if (error) {
+      status('No se pudo guardar el rol: ' + error.message);
+      return;
+    }
+
+    $('officialRoleName').value = '';
+    $('officialRoleFandom').value = '';
+
+    status('¡Rol ocupado guardado correctamente! ♡');
+    await loadOfficialRoles();
+  });
+
 
   function status(message) {
     $('status').textContent = message;
