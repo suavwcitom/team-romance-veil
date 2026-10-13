@@ -556,7 +556,69 @@ const groups = {
 'CORTIS': ['Martin', 'James', 'Juhoon', 'Seonghyeon', 'Keonho']
 };
 
-function renderCards() {
+
+async function renderCards() {
+  const selectedGroup = fandom.value;
+  const term = search.value.toLowerCase().trim();
+  const statusFilter = availability.value;
+
+  const { data: reservations, error } = await supabaseClient
+    .from('idol_reservations')
+    .select('character_name');
+
+  if (error) {
+    console.error('Error al cargar las reservas:', error);
+    feedback.textContent = 'No pudimos cargar las reservas. ♡';
+    return;
+  }
+
+  const reservedNames = new Set(
+    (reservations || []).map(r => r.character_name.toLowerCase().trim())
+  );
+
+  const entries = Object.entries(groups)
+    .filter(([group]) => !selectedGroup || group === selectedGroup)
+    .flatMap(([group, members]) =>
+      members.map((name, index) => ({ name, group, index }))
+    )
+    .filter(({ name }) => name.toLowerCase().includes(term))
+    .map(entry => ({
+      ...entry,
+      status: reservedNames.has(entry.name.toLowerCase().trim())
+        ? 'taken'
+        : 'available'
+    }))
+    .filter(({ status }) => !statusFilter || status === statusFilter);
+
+  characterGrid.querySelectorAll('.card').forEach(card => card.remove());
+
+  entries.forEach(({ name, group, index, status }) => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.dataset.name = name.toLowerCase();
+    card.dataset.fandom = group;
+    card.dataset.status = status;
+
+    card.innerHTML = `
+      <div class="card-art">${name.charAt(0)}
+        <span>${String(index + 1).padStart(2, '0')} / ${group}</span>
+      </div>
+      <div class="card-info">
+        <h3>${name}</h3>
+        <div class="fandom">${group}</div>
+        <span class="status">${status === 'taken' ? '♡ Reservado' : '♡ Available'}</span>
+        ${status === 'available'
+          ? `<button class="reserve-btn" data-character="${name}" data-group="${group}">RESERVE ♡</button>`
+          : ''}
+      </div>
+    `;
+
+    characterGrid.insertBefore(card, empty);
+  });
+
+  empty.style.display = entries.length ? 'none' : 'block';
+}
+
 const selectedGroup = fandom.value;
 const term = search.value.toLowerCase().trim();
 const statusFilter = availability.value;
