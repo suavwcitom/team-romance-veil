@@ -705,12 +705,18 @@ async function renderCards() {
   const term = search.value.toLowerCase().trim();
   const statusFilter = availability.value;
 
-  const { data: reservations, error } = await supabaseClient
-    .from('idol_reservations')
-    .select('character_name');
+  
+const { data: reservations, error } = await supabaseClient
+  .from('idol_reservations')
+  .select('character_name');
+
+const { data: otherReservations, error: otherError } = await supabaseClient
+  .from('other_reservations')
+  .select('person_name');
+
 
  
-if (error) {
+if (error || otherError) {
   console.error('Error al cargar las reservas:', error);
   feedback.textContent = 'No pudimos cargar las reservas. ♡';
 }
@@ -727,10 +733,13 @@ if (officialError) {
   return;
 }
 
+
 const reservedNames = new Set([
   ...(reservations || []).map(r => r.character_name.toLowerCase().trim()),
+  ...(otherReservations || []).map(r => r.person_name.toLowerCase().trim()),
   ...(officialRoles || []).map(r => r.character_name.toLowerCase().trim())
 ]);
+
 
 
   const entries = Object.entries(groups)
