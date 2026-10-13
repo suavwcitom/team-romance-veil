@@ -478,6 +478,16 @@ dialog input {
         maxlength="100"
         placeholder="¡Escribe tu carita occidental, influencer, etc aquí!"
       >
+      
+      <label for="otherPersonContact">Número de contacto</label>
+      <input
+        id="otherPersonContact"
+        name="otherPersonContact"
+        type="tel"
+        maxlength="30"
+        placeholder="Escribí tu número de contacto"
+      >
+      
       <p id="otherPersonStatus" aria-live="polite"></p>
     </div>
 
@@ -665,7 +675,7 @@ document.getElementById('reserveForm').addEventListener('submit', async event =>
 
   if (selectedCharacter === 'Otro' || !otherField.hidden) {
     const personName = otherInput.value.trim();
-
+const contactNumber = document.getElementById('otherPersonContact').value.trim();
     if (!personName) {
       feedback.textContent = 'Escribí el nombre de la persona que querés reservar. ♡';
       return;
