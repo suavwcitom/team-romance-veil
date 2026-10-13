@@ -716,9 +716,22 @@ if (error) {
 }
 
 
-  const reservedNames = new Set(
-    (reservations || []).map(r => r.character_name.toLowerCase().trim())
-  );
+
+const { data: officialRoles, error: officialError } = await supabaseClient
+  .from('official_roles')
+  .select('character_name');
+
+if (officialError) {
+  console.error('Error al cargar los roles oficiales:', officialError);
+  feedback.textContent = 'No pudimos comprobar los roles ocupados. ♡';
+  return;
+}
+
+const reservedNames = new Set([
+  ...(reservations || []).map(r => r.character_name.toLowerCase().trim()),
+  ...(officialRoles || []).map(r => r.character_name.toLowerCase().trim())
+]);
+
 
   const entries = Object.entries(groups)
     .filter(([group]) => !selectedGroup || group === selectedGroup)
