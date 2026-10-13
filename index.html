@@ -684,9 +684,64 @@ document.getElementById('reserveForm').addEventListener('submit', async event =>
     return;
   }
 
-  feedback.textContent =
-    'El formulario de idols todavía necesita su propia conexión con la base de datos. ♡';
-});
+  
+  const nicknameValue = document.getElementById('nickname').value.trim();
+  const contactValue = document.getElementById('Number').value.trim();
+
+  if (!selectedCharacter || selectedCharacter === 'Otro') {
+    feedback.textContent = 'Elegí un idol antes de reservar. ♡';
+    return;
+  }
+
+  feedback.textContent = 'Comprobando disponibilidad... ♡';
+
+  const { data: existingIdol, error: checkIdolError } = await supabaseClient
+    .from('idol_reservations')
+    .select('id')
+    .ilike('character_name', selectedCharacter)
+    .limit(1);
+
+  if (checkIdolError) {
+    feedback.textContent = 'No pudimos comprobar la disponibilidad. Intentá de nuevo. ♡';
+    console.error(checkIdolError);
+    return;
+  }
+
+  if (existingIdol && existingIdol.length > 0) {
+    feedback.textContent = 'Este idol ya fue reservado. Elegí otro. ♡';
+    return;
+  }
+
+  const selectedGroup = Object.entries(groups).find(([, members]) =>
+    members.some(member =>
+      (typeof member === 'string' ? member : member.name) === selectedCharacter
+    )
+  )?.[0];
+
+  if (!selectedGroup) {
+    feedback.textContent = 'No pudimos identificar el grupo de este idol. ♡';
+    return;
+  }
+
+  const { error: insertIdolError } = await supabaseClient
+    .from('idol_reservations')
+    .insert([{
+      character_name: selectedCharacter,
+      fandom: selectedGroup,
+      nickname: nicknameValue,
+      contact_number: contactValue
+    }]);
+
+  if (insertIdolError) {
+    feedback.textContent = insertIdolError.code === '23505'
+      ? 'Este idol acaba de ser reservado por alguien más. ♡'
+      : 'No se pudo guardar la reserva. Intentá de nuevo. ♡';
+    console.error(insertIdolError);
+    return;
+  }
+
+  feedback.textContent = '¡Tu reserva quedó guardada! ♡';
+
 
 
 document.getElementById('reserveOtherButton').addEventListener('click', () => {
