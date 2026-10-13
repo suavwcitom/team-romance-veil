@@ -716,10 +716,13 @@ const { data: otherReservations, error: otherError } = await supabaseClient
 
 
  
+
 if (error || otherError) {
-  console.error('Error al cargar las reservas:', error);
+  console.error('Error al cargar las reservas:', error || otherError);
   feedback.textContent = 'No pudimos cargar las reservas. ♡';
+  return;
 }
+
 
 
 
