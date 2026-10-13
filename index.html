@@ -437,7 +437,12 @@ dialog input {
       </select>
     </div>
 
-    <div class="grid" id="characterGrid">
+<button type="button" id="reserveOtherButton">
+  Otro · Celebridades occidentales / otro ♡
+</button>
+
+    
+<div class="grid" id="characterGrid">
 
 
       <div class="empty" id="empty">No encontramos personajes con esa búsqueda. ♡</div>
@@ -625,11 +630,63 @@ dialog.addEventListener('click', event => {
 if (event.target === dialog) dialog.close();
 });
 
-document.getElementById('reserveForm').addEventListener('submit', event => {
-event.preventDefault();
-feedback.textContent =
-'¡Formulario probado con éxito! ♡ Todavía falta conectar la base de datos para enviar la solicitud de verdad.';
+
+document.getElementById('reserveForm').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  const otherField = document.getElementById('otherPersonField');
+  const otherInput = document.getElementById('otherPersonName');
+  const otherStatus = document.getElementById('otherPersonStatus');
+
+  if (selectedCharacter === 'Otro' || !otherField.hidden) {
+    const personName = otherInput.value.trim();
+
+    if (!personName) {
+      feedback.textContent = 'Escribí el nombre de la persona que querés reservar. ♡';
+      return;
+    }
+
+    feedback.textContent = 'Comprobando disponibilidad... ♡';
+
+    const { data: existing, error: checkError } = await supabaseClient
+      .from('other_reservations')
+      .select('id')
+      .ilike('person_name', personName)
+      .limit(1);
+
+    if (checkError) {
+      feedback.textContent = 'No pudimos comprobar la reserva. Intentá de nuevo. ♡';
+      console.error(checkError);
+      return;
+    }
+
+    if (existing && existing.length > 0) {
+      otherStatus.textContent = 'Esta persona ya está reservada. Elegí otra. ♡';
+      feedback.textContent = 'Ese nombre ya está ocupado. ♡';
+      return;
+    }
+
+    const { error: insertError } = await supabaseClient
+      .from('other_reservations')
+      .insert([{ person_name: personName }]);
+
+    if (insertError) {
+      feedback.textContent = insertError.code === '23505'
+        ? 'Esta persona acaba de ser reservada por alguien más. ♡'
+        : 'No se pudo guardar la reserva. Intentá de nuevo. ♡';
+      console.error(insertError);
+      return;
+    }
+
+    otherStatus.textContent = '¡Nombre reservado con éxito! ♡';
+    feedback.textContent = '¡Tu reserva quedó guardada! ♡';
+    return;
+  }
+
+  feedback.textContent =
+    'El formulario de idols todavía necesita su propia conexión con la base de datos. ♡';
 });
+
 
 renderCards();
 console.log('ROMANCE VEIL funciona', Object.keys(groups).length);
