@@ -763,6 +763,47 @@ if (error) {
   empty.style.display = entries.length ? 'none' : 'block';
 }
 
+async function loadOccupiedRoles() {
+  const container = document.getElementById('occupiedList');
+  if (!container) return;
+
+  const { data, error } = await supabaseClient
+    .from('official_roles')
+    .select('character_name, fandom')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error al cargar los roles ocupados:', error);
+    container.textContent = 'No pudimos cargar los roles ocupados. ♡';
+    return;
+  }
+
+  container.replaceChildren();
+
+  if (!data || data.length === 0) {
+    const message = document.createElement('p');
+    message.className = 'occupied-empty';
+    message.textContent = 'Todavía no hay roles ocupados oficialmente. ♡';
+    container.appendChild(message);
+    return;
+  }
+
+  data.forEach(role => {
+    const card = document.createElement('div');
+    card.className = 'occupied-item';
+
+    const name = document.createElement('div');
+    name.textContent = role.character_name;
+
+    const fandom = document.createElement('small');
+    fandom.textContent = role.fandom;
+
+    card.append(name, fandom);
+    container.appendChild(card);
+  });
+}
+
+
 
 search.addEventListener('input', renderCards);
 fandom.addEventListener('change', renderCards);
@@ -936,6 +977,7 @@ document.getElementById('reserveOtherButton').addEventListener('click', () => {
 });
 
 renderCards();
+loadOccupiedRoles();
 console.log('ROMANCE VEIL funciona', Object.keys(groups).length);
 console.log('Integrantes de ENHYPEN:', groups['ENHYPEN']);
 
