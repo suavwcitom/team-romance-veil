@@ -763,7 +763,9 @@ const reservedNames = new Set([
       <div class="card-info">
         <h3>${name}</h3>
         <div class="fandom">${group}</div>
-        <span class="status">${status === 'taken' ? '♡ Reservado' : '♡ Available'}</span>
+        
+<span class="status">${status === 'taken' ? '♡ Ocupado' : '♡ Available'}</span>
+
         ${status === 'available'
           ? `<button class="reserve-btn" data-character="${name}" data-group="${group}">RESERVE ♡</button>`
           : ''}
