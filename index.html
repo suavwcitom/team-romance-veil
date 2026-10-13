@@ -688,6 +688,23 @@ document.getElementById('reserveForm').addEventListener('submit', async event =>
 });
 
 
+document.getElementById('reserveOtherButton').addEventListener('click', () => {
+  selectedCharacter = 'Otro';
+  chosen.textContent = 'Reserva de celebridad occidental / otro ';
+  feedback.textContent = '';
+
+  const otherField = document.getElementById('otherPersonField');
+  const otherInput = document.getElementById('otherPersonName');
+  const otherStatus = document.getElementById('otherPersonStatus');
+
+  otherField.hidden = false;
+  otherInput.required = true;
+  otherInput.value = '';
+  otherStatus.textContent = '';
+
+  dialog.showModal();
+});
+
 renderCards();
 console.log('ROMANCE VEIL funciona', Object.keys(groups).length);
 console.log('Integrantes de ENHYPEN:', groups['ENHYPEN']);
