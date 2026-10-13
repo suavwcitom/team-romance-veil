@@ -691,9 +691,14 @@ document.getElementById('reserveForm').addEventListener('submit', async event =>
       return;
     }
 
-    const { error: insertError } = await supabaseClient
-      .from('other_reservations')
-      .insert([{ person_name: personName }]);
+    
+const { error: insertError } = await supabaseClient
+  .from('other_reservations')
+  .insert([{
+    person_name: personName,
+    contact_number: contactNumber
+  }]);
+    
 
     if (insertError) {
       feedback.textContent = insertError.code === '23505'
