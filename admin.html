@@ -1,1 +1,270 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | ROMANCE VEIL</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #fff5f8;
+      color: #563846;
+      font-family: Arial, sans-serif;
+    }
+    main { max-width: 900px; margin: auto; }
+    h1, h2 { color: #b34f78; }
+    .panel {
+      background: white;
+      padding: 22px;
+      margin: 18px 0;
+      border-radius: 16px;
+      box-shadow: 0 3px 15px #d9a8ba40;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0;
+      border: 1px solid #e4b9ca;
+      border-radius: 9px;
+      font-size: 15px;
+    }
+    button {
+      background: #bd668b;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: wait; }
+    .delete { background: #8b435c; width: auto; }
+    .reservation {
+      border: 1px solid #f0d5df;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 12px 0;
+      overflow-wrap: anywhere;
+    }
+    .muted { color: #927583; font-size: 13px; }
+    #dashboard, #logout { display: none; }
+    #status { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>ROMANCE VEIL ♡</h1>
+  <p>Panel privado de administración</p>
+
+  <section class="panel" id="login">
+    <h2>Iniciar sesión</h2>
+    <form id="loginForm">
+      <input id="email" type="email" placeholder="Tu correo electrónico" required>
+      <input id="password" type="password" placeholder="Tu contraseña" required>
+      <button id="loginButton" type="submit">Entrar al panel</button>
+    </form>
+  </section>
+
+  <p id="status" role="status"></p>
+
+  <section id="dashboard">
+    <button id="refreshButton">Actualizar reservas</button>
+    <button id="logout">Cerrar sesión</button>
+
+    <section class="panel">
+      <h2>Reservas de idols</h2>
+      <div id="idolList">Cargando...</div>
+    </section>
+
+    <section class="panel">
+      <h2>Reservas de otras personas</h2>
+      <div id="otherList">Cargando...</div>
+    </section>
+  </section>
+</main>
+
+<script>
+  // Usá la misma URL y la clave pública (anon/publishable)
+  // que ya están configuradas en tu index.html.
+  const SUPABASE_URL = 'https://xgtxfkbhdgpuarxhzajk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable__kHbGsl9xYFW8D5dAk6bIQ_5kk2g8XX';
+
+  const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  const $ = id => document.getElementById(id);
+  let busy = false;
+
+  function status(message) {
+    $('status').textContent = message;
+  }
+
+  function showDashboard(visible) {
+    $('login').style.display = visible ? 'none' : 'block';
+    $('dashboard').style.display = visible ? 'block' : 'none';
+    $('logout').style.display = visible ? 'block' : 'none';
+  }
+
+  function addText(parent, tag, value) {
+    const el = document.createElement(tag);
+    el.textContent = value ?? '—';
+    parent.appendChild(el);
+    return el;
+  }
+
+  function renderReservations(containerId, rows, type) {
+    const container = $(containerId);
+    container.replaceChildren();
+
+    if (!rows.length) {
+      addText(container, 'p', 'Todavía no hay reservas.');
+      return;
+    }
+
+    rows.forEach(row => {
+      const card = document.createElement('article');
+      card.className = 'reservation';
+
+      if (type === 'idol') {
+        addText(card, 'h3', row.character_name);
+        addText(card, 'p', 'Fandom: ' + (row.fandom || '—'));
+        addText(card, 'p', 'Nickname: ' + (row.nickname || '—'));
+      } else {
+        addText(card, 'h3', row.person_name);
+      }
+
+      addText(card, 'p', 'Contacto: ' + (row.contact_number || '—'));
+      addText(
+        card,
+        'p',
+        'Fecha: ' + (row.created_at
+          ? new Date(row.created_at).toLocaleString()
+          : '—')
+      );
+
+      const del = document.createElement('button');
+      del.className = 'delete';
+      del.textContent = 'Eliminar reserva';
+      del.addEventListener('click', async () => {
+        if (!confirm('¿Querés eliminar esta reserva?')) return;
+
+        del.disabled = true;
+        const table = type === 'idol'
+          ? 'idol_reservations'
+          : 'other_reservations';
+
+        const { error } = await db
+          .from(table)
+          .delete()
+          .eq('id', row.id);
+
+        if (error) {
+          status('No se pudo eliminar la reserva: ' + error.message);
+          del.disabled = false;
+          return;
+        }
+
+        status('Reserva eliminada.');
+        await loadReservations();
+      });
+
+      card.appendChild(del);
+      container.appendChild(card);
+    });
+  }
+
+  async function loadReservations() {
+    status('Cargando reservas...');
+
+    const [idols, others] = await Promise.all([
+      db.from('idol_reservations')
+        .select('id, character_name, fandom, nickname, contact_number, created_at')
+        .order('created_at', { ascending: false }),
+      db.from('other_reservations')
+        .select('id, person_name, contact_number, created_at')
+        .order('created_at', { ascending: false })
+    ]);
+
+    if (idols.error || others.error) {
+      status(
+        'No se pudieron cargar las reservas. Revisá los permisos de administrador en Supabase.'
+      );
+      return;
+    }
+
+    renderReservations('idolList', idols.data || [], 'idol');
+    renderReservations('otherList', others.data || [], 'other');
+    status('Reservas actualizadas ♡');
+  }
+
+  async function checkSession() {
+    showDashboard(false);
+
+    const { data: { session }, error } = await db.auth.getSession();
+
+    if (error) {
+      status('No se pudo comprobar la sesión.');
+      return;
+    }
+
+    if (!session) {
+      status('Iniciá sesión para continuar.');
+      return;
+    }
+
+    const { data: admin, error: adminError } = await db
+      .from('admin_users')
+      .select('user_id')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    if (adminError || !admin) {
+      await db.auth.signOut();
+      status('Esta cuenta no tiene permisos de administrador.');
+      return;
+    }
+
+    showDashboard(true);
+    await loadReservations();
+  }
+
+  $('loginForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    if (busy) return;
+
+    busy = true;
+    $('loginButton').disabled = true;
+    status('Iniciando sesión...');
+
+    const { error } = await db.auth.signInWithPassword({
+      email: $('email').value.trim(),
+      password: $('password').value
+    });
+
+    busy = false;
+    $('loginButton').disabled = false;
+
+    if (error) {
+      status('No se pudo iniciar sesión. Revisá tu correo y contraseña.');
+      return;
+    }
+
+    await checkSession();
+  });
+
+  $('refreshButton').addEventListener('click', loadReservations);
+
+  $('logout').addEventListener('click', async () => {
+    await db.auth.signOut();
+    showDashboard(false);
+    status('Cerraste sesión.');
+  });
+
+  checkSession();
+</script>
+</body>
+</html>
+  
