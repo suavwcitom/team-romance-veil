@@ -547,6 +547,46 @@ const feedback = document.getElementById('feedback');
 const empty = document.getElementById('empty');
 
 let selectedCharacter = '';
+const navLinks = [...document.querySelectorAll('nav a')];
+const navSections = navLinks
+  .map(link => document.querySelector(link.getAttribute('href')))
+  .filter(Boolean);
+
+function setActiveNav(sectionId) {
+  navLinks.forEach(link => {
+    const active = link.getAttribute('href') === '#' + sectionId;
+    link.classList.toggle('active', active);
+
+    if (active) {
+      link.setAttribute('aria-current', 'location');
+    } else {
+      link.removeAttribute('aria-current');
+    }
+  });
+}
+
+navLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    setActiveNav(link.getAttribute('href').slice(1));
+  });
+});
+
+setActiveNav('home');
+
+const navObserver = new IntersectionObserver(entries => {
+  const visible = entries
+    .filter(entry => entry.isIntersecting)
+    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+  if (visible) {
+    setActiveNav(visible.target.id);
+  }
+}, {
+  rootMargin: '-20% 0px -60% 0px',
+  threshold: [0, 0.1, 0.25, 0.5]
+});
+
+navSections.forEach(section => navObserver.observe(section));
 
 const groups = {
 'ENHYPEN': ['Jungwon', 'Heeseung', 'Jay', 'Jake', 'Sunghoon', 'Sunoo', 'Ni-ki'],
