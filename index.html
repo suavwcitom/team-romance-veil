@@ -568,11 +568,12 @@ async function renderCards() {
     .from('idol_reservations')
     .select('character_name');
 
-  if (error) {
-    console.error('Error al cargar las reservas:', error);
-    feedback.textContent = 'No pudimos cargar las reservas. ♡';
-    return;
-  }
+ 
+if (error) {
+  console.error('Error al cargar las reservas:', error);
+  feedback.textContent = 'No pudimos cargar las reservas. ♡';
+}
+
 
   const reservedNames = new Set(
     (reservations || []).map(r => r.character_name.toLowerCase().trim())
