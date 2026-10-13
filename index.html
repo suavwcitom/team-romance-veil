@@ -63,11 +63,24 @@ button { cursor: pointer; }
 
 nav { display: flex; gap: 22px; }
 nav a {
+  display: inline-block;
+  padding: 8px 10px;
+  border-radius: 3px;
   color: var(--text);
   text-decoration: none;
   font-size: 12px;
+  transition: background .2s, color .2s;
 }
-nav a:hover { color: var(--red); }
+
+nav a:hover {
+  color: var(--red);
+  background: var(--pink);
+}
+
+nav a.active {
+  color: white;
+  background: var(--red);
+}
 
 .hero {
   padding: 65px 20px 55px;
