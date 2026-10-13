@@ -299,6 +299,44 @@ nav a.active {
   line-height: 2;
 }
 
+.occupied-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.occupied-item {
+  padding: 18px 14px;
+  text-align: center;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--red);
+  color: var(--text);
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+}
+
+.occupied-item small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.occupied-empty {
+  grid-column: 1 / -1;
+  padding: 25px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--cream);
+  border: 1px dashed var(--line);
+  font-size: 12px;
+}
+
+
 footer {
   background: var(--cream);
   text-align: center;
