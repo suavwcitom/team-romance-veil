@@ -622,47 +622,6 @@ if (error) {
   empty.style.display = entries.length ? 'none' : 'block';
 }
 
-const selectedGroup = fandom.value;
-const term = search.value.toLowerCase().trim();
-const statusFilter = availability.value;
-
-const entries = Object.entries(groups)
-.filter(([group]) => !selectedGroup || group === selectedGroup)
-.flatMap(([group, members]) =>
-members.map((name, index) => ({ name, group, index }))
-)
-.filter(({ name }) => name.toLowerCase().includes(term));
-
-characterGrid.querySelectorAll('.card').forEach(card => card.remove());
-
-entries.forEach(({ name, group, index }) => {
-const card = document.createElement('article');
-card.className = 'card';
-card.dataset.name = name.toLowerCase();
-card.dataset.fandom = group;
-card.dataset.status = 'available';
-
-card.innerHTML = `
-  <div class="card-art">${name.charAt(0)}
-    <span>${String(index + 1).padStart(2, '0')} / ${group}</span>
-  </div>
-  <div class="card-info">
-    <h3>${name}</h3>
-    <div class="fandom">${group}</div>
-    <span class="status">♡ Available</span>
-    <button class="reserve-btn" data-character="${name}" data-group="${group}">RESERVE ♡</button>
-  </div>
-`;
-
-if (!statusFilter || statusFilter === 'available') {
-  characterGrid.insertBefore(card, empty);
-}
-
-});
-
-empty.style.display =
-characterGrid.querySelectorAll('.card').length ? 'none' : 'block';
-}
 
 search.addEventListener('input', renderCards);
 fandom.addEventListener('change', renderCards);
