@@ -103,7 +103,6 @@
       <div id="officialRolesList">Cargando roles...</div>
     </section>
 
-
     <section class="panel">
       <h2>Reservas de idols</h2>
       <div id="idolList">Cargando...</div>
@@ -117,8 +116,6 @@
 </main>
 
 <script>
-  // Usá la misma URL y la clave pública (anon/publishable)
-  // que ya están configuradas en tu index.html.
   const SUPABASE_URL = 'https://xgtxfkbhdgpuarxhzajk.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable__kHbGsl9xYFW8D5dAk6bIQ_5kk2g8XX';
 
@@ -224,7 +221,6 @@
     await loadOfficialRoles();
   });
 
-
   function status(message) {
     $('status').textContent = message;
   }
@@ -275,6 +271,7 @@
       const del = document.createElement('button');
       del.className = 'delete';
       del.textContent = 'Eliminar reserva';
+
       del.addEventListener('click', async () => {
         if (!confirm('¿Querés eliminar esta reserva?')) return;
 
@@ -355,7 +352,9 @@
     }
 
     showDashboard(true);
+
     await loadReservations();
+    await loadOfficialRoles();
   }
 
   $('loginForm').addEventListener('submit', async event => {
@@ -382,7 +381,10 @@
     await checkSession();
   });
 
-  $('refreshButton').addEventListener('click', loadReservations);
+  $('refreshButton').addEventListener('click', async () => {
+    await loadReservations();
+    await loadOfficialRoles();
+  });
 
   $('logout').addEventListener('click', async () => {
     await db.auth.signOut();
@@ -394,4 +396,3 @@
 </script>
 </body>
 </html>
-  
