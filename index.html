@@ -688,13 +688,22 @@ function namesMatch(a, b) {
 
   if (!nameA || !nameB) return false;
 
-  const wordsA = [...new Set(nameA.split(' '))];
-  const wordsB = [...new Set(nameB.split(' '))];
+  const wordsA = nameA.split(' ').sort();
+  const wordsB = nameB.split(' ').sort();
 
-  return (
-    wordsA.every(word => wordsB.includes(word)) ||
-    wordsB.every(word => wordsA.includes(word))
-  );
+  // Coincidencia exacta, aunque el orden sea distinto.
+  if (wordsA.join(' ') === wordsB.join(' ')) return true;
+
+  // Permitir nombre abreviado de una sola palabra.
+  if (wordsA.length === 1 && wordsB.length > 1) {
+    return wordsB.includes(wordsA[0]);
+  }
+
+  if (wordsB.length === 1 && wordsA.length > 1) {
+    return wordsA.includes(wordsB[0]);
+  }
+
+  return false;
 }
 
 /* PROTECCIÓN PARA MOSTRAR TEXTO */
