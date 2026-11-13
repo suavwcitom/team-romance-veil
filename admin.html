@@ -250,6 +250,7 @@ async function loadOfficialRoles() {
   }
 
   
+
 function renderReservations(containerId, rows, type) {
   const container = $(containerId);
   container.replaceChildren();
@@ -333,61 +334,6 @@ function renderReservations(containerId, rows, type) {
     container.appendChild(card);
   });
 }
-
-
-    rows.forEach(row => {
-      const card = document.createElement('article');
-      card.className = 'reservation';
-
-      if (type === 'idol') {
-        addText(card, 'h3', row.character_name);
-        addText(card, 'p', 'Fandom: ' + (row.fandom || '—'));
-        addText(card, 'p', 'Nickname: ' + (row.nickname || '—'));
-      } else {
-        addText(card, 'h3', row.person_name);
-      }
-
-      addText(card, 'p', 'Contacto: ' + (row.contact_number || '—'));
-      addText(
-        card,
-        'p',
-        'Fecha: ' + (row.created_at
-          ? new Date(row.created_at).toLocaleString()
-          : '—')
-      );
-
-      const del = document.createElement('button');
-      del.className = 'delete';
-      del.textContent = 'Eliminar reserva';
-
-      del.addEventListener('click', async () => {
-        if (!confirm('¿Querés eliminar esta reserva?')) return;
-
-        del.disabled = true;
-        const table = type === 'idol'
-          ? 'idol_reservations'
-          : 'other_reservations';
-
-        const { error } = await db
-          .from(table)
-          .delete()
-          .eq('id', row.id);
-
-        if (error) {
-          status('No se pudo eliminar la reserva: ' + error.message);
-          del.disabled = false;
-          return;
-        }
-
-        status('Reserva eliminada.');
-        await loadReservations();
-      });
-
-      card.appendChild(del);
-      container.appendChild(card);
-    });
-  }
-
 $('reservationSearch').addEventListener('input', () => {
   loadReservations();
 });
