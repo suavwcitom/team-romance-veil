@@ -906,36 +906,53 @@ async function renderOccupied() {
   const rows = [
     ...currentOfficialRoles.map(row => ({
       name: row.character_name,
-      detail: row.fandom
-        ? `${row.fandom} · Ocupado oficialmente`
-        : 'Ocupado oficialmente',
-      official: true
+      detail: row.fandom || 'Ocupado oficialmente'
     })),
 
     ...currentReservations.map(row => ({
       name: row.character_name,
-      detail: 'Reservado',
-      official: false
+      detail: 'Reservado'
     })),
 
     ...currentOtherReservations.map(row => ({
       name: row.person_name,
-      detail: 'Reservado',
-      official: false
+      detail: 'Reservado'
     }))
   ].filter(row => row.name);
 
   const unique = [];
 
   rows.forEach(row => {
-    const existing = unique.find(item =>
-      namesMatch(item.name, row.name)
-    );
-
-    if (!existing) {
+    if (!unique.some(item => namesMatch(item.name, row.name))) {
       unique.push(row);
     }
   });
+
+  occupiedList.innerHTML = '';
+
+  if (!unique.length) {
+    occupiedList.innerHTML = `
+      <p class="occupied-empty">
+        Todavía no hay roles ocupados.
+      </p>
+    `;
+    return;
+  }
+
+  unique.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+
+  unique.forEach(row => {
+    const item = document.createElement('div');
+    item.className = 'occupied-item';
+    item.textContent = row.name;
+
+    const small = document.createElement('small');
+    small.textContent = row.detail;
+
+    item.appendChild(small);
+    occupiedList.appendChild(item);
+  });
+}
 
   occupiedList.innerHTML = '';
 
