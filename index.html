@@ -690,8 +690,8 @@ function namesMatch(a, b) {
 
   return (
     nameA === nameB ||
-    nameA.startsWith(nameB) ||
-    nameB.startsWith(nameA)
+    nameA.startsWith(nameB + ' ') ||
+    nameB.startsWith(nameA + ' ')
   );
 }
 
@@ -767,7 +767,7 @@ async function fetchReservations() {
       .select('id, person_name'),
 
     supabaseClient
-      .from('official_roles')
+      .from('roles')
       .select('character_name, fandom')
   ]);
 
@@ -794,7 +794,10 @@ function isNameTaken(name) {
   );
 }
 
+
 /* RENDERIZAR TARJETAS */
+
+let selectedFandom = '';
 
 async function renderCards() {
   try {
@@ -804,13 +807,361 @@ async function renderCards() {
     const term = normalizePersonName(search.value);
     const statusFilter = availability.value;
 
-    const idolEntries = Object.entries(groups)
+    const entries = Object.entries(groups)
       .filter(([group]) => !selectedGroup || group === selectedGroup)
       .flatMap(([group, members]) =>
-        members.map((name, index) => ({
-          name,
-          group,
-          index
-        }))
-)
-.filter(({name,group})=>
+        members.map(name => ({ name, group }))
+      )
+      .filter(({name, group}) => {
+        const matchesSearch =
+          !term ||
+          normalizePersonName(name).includes(term) ||
+          normalizePersonName(group).includes(term);
+
+        const taken = isNameTaken(name);
+
+        const matchesStatus =
+          !statusFilter ||
+          (statusFilter === 'taken' && taken) ||
+          (statusFilter === 'available' && !taken);
+
+        return matchesSearch && matchesStatus;
+      });
+
+    characterGrid.querySelectorAll('.card').forEach(card => card.remove());
+
+    entries.forEach(({name, group}) => {
+      const taken = isNameTaken(name);
+
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      card.innerHTML = `
+        <div class="card-art">
+          ${escapeHTML(name.charAt(0).toUpperCase())}
+          <span>${escapeHTML(group)}</span>
+        </div>
+
+        <div class="card-info">
+          <h3>${escapeHTML(name)}</h3>
+          <div class="fandom">${escapeHTML(group)}</div>
+
+          <span class="status ${taken ? 'taken' : ''}">
+            ${taken ? 'Ocupado' : 'Disponible'}
+          </span>
+
+          <button class="reserve-btn" type="button" ${taken ? 'disabled' : ''}>
+            ${taken ? 'NO DISPONIBLE' : 'RESERVAR'}
+          </button>
+        </div>
+      `;
+
+      if (!taken) {
+        card.querySelector('button').addEventListener('click', () => {
+          selectedCharacter = name;
+          selectedFandom = group;
+
+          chosen.textContent = name + ' · ' + group;
+
+          otherField.hidden = true;
+          otherInput.required = false;
+          otherInput.value = '';
+          otherStatus.textContent = '';
+          feedback.textContent = '';
+
+          submitButton.disabled = false;
+          dialog.showModal();
+        });
+      }
+
+      characterGrid.insertBefore(card, empty);
+    });
+
+    empty.style.display = entries.length ? 'none' : 'block';
+
+    await renderOccupied();
+
+  } catch (error) {
+    console.error('Error al cargar personajes:', error);
+
+    characterGrid.querySelectorAll('.card').forEach(card => card.remove());
+
+    empty.textContent =
+      'No se pudieron cargar los personajes. Intentá nuevamente.';
+
+    empty.style.display = 'block';
+  }
+}
+
+/* MOSTRAR PERSONAJES OCUPADOS */
+
+async function renderOccupied() {
+  const occupiedList = document.getElementById('occupiedList');
+
+  if (!occupiedList) return;
+
+  const rows = [
+    ...currentOfficialRoles.map(row => ({
+      name: row.character_name,
+      detail: row.fandom || 'Rol oficial'
+    })),
+
+    ...currentReservations.map(row => ({
+      name: row.character_name,
+      detail: 'Reserva de idol'
+    })),
+
+    ...currentOtherReservations.map(row => ({
+      name: row.person_name,
+      detail: 'Carita occidental / otro'
+    }))
+  ].filter(row => row.name);
+
+  const unique = [];
+
+  rows.forEach(row => {
+    if (!unique.some(item => namesMatch(item.name, row.name))) {
+      unique.push(row);
+    }
+  });
+
+  occupiedList.innerHTML = '';
+
+  if (!unique.length) {
+    occupiedList.innerHTML = `
+      <p class="occupied-empty">
+        Todavía no hay roles ocupados.
+      </p>
+    `;
+    return;
+  }
+
+  unique.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+
+  unique.forEach(row => {
+    const item = document.createElement('div');
+    item.className = 'occupied-item';
+
+    item.textContent = row.name;
+
+    const small = document.createElement('small');
+    small.textContent = row.detail;
+
+    item.appendChild(small);
+    occupiedList.appendChild(item);
+  });
+}
+
+/* ACTUALIZAR LA PÁGINA */
+
+async function refreshPage() {
+  await fetchReservations();
+  await renderCards();
+}
+
+/* RESERVAR CARITA OCCIDENTAL / OTRO */
+
+document.getElementById('reserveOtherButton')
+  .addEventListener('click', () => {
+
+    selectedCharacter = '__other__';
+    selectedFandom = '';
+
+    chosen.textContent = 'Carita occidental / otro';
+
+    otherField.hidden = false;
+    otherInput.required = true;
+    otherInput.value = '';
+
+    otherStatus.textContent = '';
+    feedback.textContent = '';
+
+    submitButton.disabled = false;
+
+    dialog.showModal();
+  });
+
+/* COMPROBAR DISPONIBILIDAD DE OTRO */
+
+async function checkOtherPerson() {
+  const name = otherInput.value.trim();
+
+  if (!name) {
+    otherStatus.textContent = '';
+    return false;
+  }
+
+  try {
+    await fetchReservations();
+
+    const allNames = [
+      ...currentOtherReservations.map(row => row.person_name),
+      ...currentReservations.map(row => row.character_name),
+      ...currentOfficialRoles.map(row => row.character_name)
+    ];
+
+    const found = allNames.find(existing =>
+      namesMatch(existing, name)
+    );
+
+    if (found) {
+      otherStatus.textContent = 'Este personaje ya está ocupado.';
+      otherStatus.style.color = 'var(--red)';
+      return true;
+    }
+
+    otherStatus.textContent = 'Este personaje está disponible.';
+    otherStatus.style.color = '#4d7049';
+
+    return false;
+
+  } catch (error) {
+    console.error(error);
+
+    otherStatus.textContent =
+      'No se pudo comprobar la disponibilidad. Intentá nuevamente.';
+
+    otherStatus.style.color = 'var(--red)';
+
+    return true;
+  }
+}
+
+otherInput.addEventListener('blur', checkOtherPerson);
+
+/* GUARDAR RESERVAS */
+
+document.getElementById('reserveForm')
+  .addEventListener('submit', async event => {
+
+    event.preventDefault();
+
+    if (isSubmitting) return;
+
+    const nickname = document.getElementById('nickname').value.trim();
+    const contactNumber = document.getElementById('Number').value.trim();
+
+    if (!nickname || !contactNumber) {
+      feedback.textContent =
+        'Completá tu nombre y número de contacto.';
+      return;
+    }
+
+    isSubmitting = true;
+    submitButton.disabled = true;
+
+    feedback.textContent = 'Verificando disponibilidad...';
+
+    try {
+      await fetchReservations();
+
+      /* RESERVA OCCIDENTAL */
+
+      if (selectedCharacter === '__other__') {
+        const personName = otherInput.value.trim();
+
+        if (!personName) {
+          feedback.textContent =
+            'Escribí el nombre de la persona que querés reservar.';
+          return;
+        }
+
+        const allNames = [
+          ...currentOtherReservations.map(row => row.person_name),
+          ...currentReservations.map(row => row.character_name),
+          ...currentOfficialRoles.map(row => row.character_name)
+        ];
+
+        const alreadyTaken = allNames.some(existing =>
+          namesMatch(existing, personName)
+        );
+
+        if (alreadyTaken) {
+          otherStatus.textContent =
+            'Este personaje ya está ocupado.';
+
+          otherStatus.style.color = 'var(--red)';
+
+          feedback.textContent =
+            'No se puede reservar: este personaje ya está ocupado.';
+
+          return;
+        }
+
+        const result = await supabaseClient
+          .from('other_reservations')
+          .insert([{ person_name: personName }]);
+
+        if (result.error) throw result.error;
+      }
+
+      /* RESERVA DE IDOL */
+
+      else {
+        if (!selectedCharacter || isNameTaken(selectedCharacter)) {
+          feedback.textContent =
+            'Este personaje ya está ocupado. Actualizá la página.';
+
+          return;
+        }
+
+        const result = await supabaseClient
+          .from('idol_reservations')
+          .insert([{
+            character_name: selectedCharacter,
+            fandom: selectedFandom,
+            nickname: nickname,
+            contact_number: contactNumber
+          }]);
+
+        if (result.error) throw result.error;
+      }
+
+      feedback.textContent =
+        '¡Reserva realizada correctamente! ♡';
+
+      await refreshPage();
+
+      setTimeout(() => {
+        if (dialog.open) dialog.close();
+      }, 1100);
+
+    } catch (error) {
+      console.error('Error al guardar reserva:', error);
+
+      feedback.textContent =
+        'No se pudo guardar la reserva. Intentá nuevamente.';
+
+    } finally {
+      isSubmitting = false;
+      submitButton.disabled = false;
+    }
+  });
+
+/* CERRAR FORMULARIO */
+
+document.getElementById('cancelBtn')
+  .addEventListener('click', () => {
+    dialog.close();
+  });
+
+dialog.addEventListener('click', event => {
+  if (event.target === dialog) {
+    dialog.close();
+  }
+});
+
+/* FILTROS */
+
+search.addEventListener('input', renderCards);
+fandom.addEventListener('change', renderCards);
+availability.addEventListener('change', renderCards);
+
+/* INICIAR */
+
+refreshPage();
+
+</script>
+
+</body>
+</html>
