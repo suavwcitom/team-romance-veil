@@ -1003,7 +1003,10 @@ async function renderOccupied() {
 
 /* ACTUALIZAR LA PÁGINA */
 
-async function refreshPage() {
+refreshPage().catch(error => {
+  console.error('ERROR GENERAL:', error);
+  alert('Error al cargar: ' + error.message);
+});
   await fetchReservations();
   await renderCards();
 }
