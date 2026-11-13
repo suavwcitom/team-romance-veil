@@ -133,7 +133,7 @@ async function loadOfficialRoles() {
   container.textContent = 'Cargando roles...';
 
   const { data, error } = await db
-    .from('roles')
+    .from('official_roles')
     .select('id, character_name, fandom, created_at')
     .order('created_at', { ascending: false });
 
@@ -167,7 +167,7 @@ async function loadOfficialRoles() {
       del.disabled = true;
 
       const { error: deleteError } = await db
-        .from('roles')
+        .from('official_roles')
         .delete()
         .eq('id', role.id);
 
@@ -203,7 +203,7 @@ async function loadOfficialRoles() {
     status('Guardando rol ocupado...');
 
     const { error } = await db
-  .from('roles')
+  .from('official_roles')
   .insert([{
     character_name: characterName,
     fandom: fandom
