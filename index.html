@@ -906,7 +906,7 @@ async function renderCards() {
     characterGrid.querySelectorAll('.card').forEach(card => card.remove());
 
     empty.textContent =
-      'No se pudieron cargar los personajes. Intentá nuevamente.';
+  'ERROR: ' + (error.message || String(error));
 
     empty.style.display = 'block';
   }
