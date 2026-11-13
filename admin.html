@@ -394,7 +394,8 @@ $('reservationSearch').addEventListener('input', () => {
     await loadOfficialRoles();
   }
 
-  $('loginForm').addEventListener('submit', async event => {
+  
+$('loginForm').addEventListener('submit', async event => {
   event.preventDefault();
   if (busy) return;
 
@@ -419,17 +420,11 @@ $('reservationSearch').addEventListener('input', () => {
     status('ERROR: ' + error.message);
 
   } finally {
-  
     busy = false;
     $('loginButton').disabled = false;
+  }
+});
 
-    if (error) {
-      status('No se pudo iniciar sesión. Revisá tu correo y contraseña.');
-      return;
-    }
-
-    await checkSession();
-  });
 
   $('refreshButton').addEventListener('click', async () => {
     await loadReservations();
