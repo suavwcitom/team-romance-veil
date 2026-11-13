@@ -688,13 +688,22 @@ function namesMatch(a, b) {
 
   if (!nameA || !nameB) return false;
 
-  const wordsA = nameA.split(' ').sort();
-  const wordsB = nameB.split(' ').sort();
+  // Solo coincide el nombre completo, sin importar el orden.
+  return nameA.split(' ').sort().join(' ') ===
+         nameB.split(' ').sort().join(' ');
+}
 
-  // Coincidencia exacta, aunque el orden sea distinto.
-  if (wordsA.join(' ') === wordsB.join(' ')) return true;
+// Coincidencia abreviada SOLO para reservas de otras personas.
+function otherNamesMatch(a, b) {
+  const nameA = normalizePersonName(a);
+  const nameB = normalizePersonName(b);
 
-  // Permitir nombre abreviado de una sola palabra.
+  if (!nameA || !nameB) return false;
+  if (namesMatch(nameA, nameB)) return true;
+
+  const wordsA = nameA.split(' ');
+  const wordsB = nameB.split(' ');
+
   if (wordsA.length === 1 && wordsB.length > 1) {
     return wordsB.includes(wordsA[0]);
   }
@@ -796,7 +805,6 @@ async function fetchReservations() {
 function isNameTaken(name) {
   const allNames = [
     ...currentReservations.map(row => row.character_name),
-    ...currentOtherReservations.map(row => row.person_name),
     ...currentOfficialRoles.map(row => row.character_name)
   ];
 
@@ -913,24 +921,14 @@ async function renderOccupied() {
 
   if (!occupiedList) return;
 
-  const rows = [
-    ...currentOfficialRoles.map(row => ({
+  const rows = currentOfficialRoles
+    .filter(row => row.character_name)
+    .map(row => ({
       name: row.character_name,
       detail: row.fandom
         ? `${row.fandom} · Ocupado oficialmente`
         : 'Ocupado oficialmente'
-    })),
-
-    ...currentReservations.map(row => ({
-      name: row.character_name,
-      detail: 'Reservado'
-    })),
-
-    ...currentOtherReservations.map(row => ({
-      name: row.person_name,
-      detail: 'Reservado'
-    }))
-  ].filter(row => row.name);
+    }));
 
   const unique = [];
 
@@ -951,9 +949,7 @@ async function renderOccupied() {
     return;
   }
 
-  unique.sort((a, b) =>
-    a.name.localeCompare(b.name, 'es')
-  );
+  unique.sort((a, b) => a.name.localeCompare(b.name, 'es'));
 
   unique.forEach(row => {
     const item = document.createElement('div');
@@ -1013,15 +1009,9 @@ async function checkOtherPerson() {
   try {
     await fetchReservations();
 
-    const allNames = [
-      ...currentOtherReservations.map(row => row.person_name),
-      ...currentReservations.map(row => row.character_name),
-      ...currentOfficialRoles.map(row => row.character_name)
-    ];
-
-    const found = allNames.find(existing =>
-      namesMatch(existing, name)
-    );
+    const found = currentOtherReservations.find(existing =>
+  otherNamesMatch(existing.person_name, name)
+);
 
     if (found) {
       otherStatus.textContent = 'Este personaje ya está ocupado.';
