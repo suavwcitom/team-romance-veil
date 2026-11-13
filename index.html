@@ -813,5 +813,348 @@ async function renderCards() {
           index
         }))
       )
-      .filter(({name}) =>
+
+  .filter(({name, group}) =>
+    !term ||
+    normalizePersonName(name).includes(term) ||
+    normalizePersonName(group).includes(term)
+  );
+
+    const entries = idolEntries.map(entry => ({
+      ...entry,
+      status: isNameTaken(entry.name) ? 'taken' : 'available'
+    })).filter(({status}) =>
+      !statusFilter || status === statusFilter
+    );
+
+    characterGrid.innerHTML = '';
+
+    entries.forEach(({name, group, status}) => {
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      card.innerHTML = `
+        <div class="card-art">
+          ${escapeHTML(name.charAt(0))}
+          <span>ROMANCE VEIL</span>
+        </div>
+
+        <div class="card-info">
+          <h3>${escapeHTML(name)}</h3>
+          <div class="fandom">${escapeHTML(group)}</div>
+
+          <span class="status ${status}">
+            ${status === 'taken' ? 'Reservado' : 'Disponible'}
+          </span>
+
+          <button
+            class="reserve-btn"
+            type="button"
+            ${status === 'taken' ? 'disabled' : ''}
+          >
+            ${status === 'taken' ? 'NO DISPONIBLE' : 'RESERVAR'}
+          </button>
+        </div>
+      `;
+
+      const button = card.querySelector('.reserve-btn');
+
+      button.addEventListener('click', () => {
+        openReservation(name, false);
+      });
+
+      characterGrid.appendChild(card);
+    });
+
+    if (entries.length === 0) {
+      characterGrid.innerHTML = `
+        <div class="empty" style="display:block">
+          No encontramos personajes con esa búsqueda.
+        </div>
+      `;
+    }
+
+    renderOccupied();
+
+  } catch (error) {
+    console.error('Error al cargar reservas:', error);
+
+    characterGrid.innerHTML = `
+      <div class="empty" style="display:block">
+        No se pudieron cargar los personajes.
+        Intentá nuevamente.
+      </div>
+    `;
+  }
+}
+
+/* MOSTRAR ROLES OFICIALES OCUPADOS */
+
+function renderOccupied() {
+  const occupiedList = document.getElementById('occupiedList');
+
+  const uniqueRoles = [];
+
+  currentOfficialRoles.forEach(role => {
+    const exists = uniqueRoles.some(item =>
+      normalizePersonName(item.character_name) ===
+      normalizePersonName(role.character_name)
+    );
+
+    if (!exists) uniqueRoles.push(role);
+  });
+
+  if (!uniqueRoles.length) {
+    occupiedList.innerHTML = `
+      <div class="occupied-empty">
+        Próximamente se agregarán los roles ocupados.
+      </div>
+    `;
+    return;
+  }
+
+  occupiedList.innerHTML = uniqueRoles.map(role => `
+    <div class="occupied-item">
+      ${escapeHTML(role.character_name)}
+      <small>${escapeHTML(role.fandom || 'Ocupado')}</small>
+    </div>
+  `).join('');
+}
+
+/* ABRIR FORMULARIO */
+
+function openReservation(name, isOther = false) {
+  selectedCharacter = name;
+
+  otherField.hidden = !isOther;
+
+  chosen.textContent = isOther
+    ? 'Carita occidental / otro'
+    : `Personaje seleccionado: ${name}`;
+
+  feedback.textContent = '';
+  otherStatus.textContent = '';
+
+  document.getElementById('reserveForm').reset();
+
+  dialog.showModal();
+}
+
+/* BOTÓN DE CARITAS OCCIDENTALES */
+
+document
+  .getElementById('reserveOtherButton')
+  .addEventListener('click', () => {
+    openReservation('other', true);
+  });
+
+/* COMPROBAR DISPONIBILIDAD DE CARITAS OCCIDENTALES */
+
+otherInput.addEventListener('input', async () => {
+  const name = otherInput.value.trim();
+
+  otherStatus.textContent = '';
+
+  if (name.length < 2) return;
+
+  try {
+    await fetchReservations();
+
+    if (isNameTaken(name)) {
+      otherStatus.textContent =
+        'Este nombre ya está reservado o registrado. ♡';
+
+      otherStatus.style.color = '#a52f48';
+    } else {
+      otherStatus.textContent =
+        '¡Este nombre parece estar disponible! ♡';
+
+      otherStatus.style.color = '#4d7049';
+    }
+
+  } catch (error) {
+    console.error(error);
+
+    otherStatus.textContent =
+      'No se pudo comprobar la disponibilidad.';
+  }
+});
+
+/* CANCELAR */
+
+document.getElementById('cancelBtn').addEventListener('click', () => {
+  dialog.close();
+});
+
+/* ENVIAR RESERVA */
+
+document.getElementById('reserveForm').addEventListener(
+  'submit',
+  async event => {
+
+    event.preventDefault();
+
+    if (isSubmitting) return;
+
+    const nickname = document
+      .getElementById('nickname')
+      .value.trim();
+
+    const contactNumber = document
+      .getElementById('Number')
+      .value.trim();
+
+    const isOther = !otherField.hidden;
+
+    const personName = isOther
+      ? otherInput.value.trim()
+      : selectedCharacter;
+
+    if (!nickname || !contactNumber || !personName) {
+      feedback.textContent = 'Completá todos los campos.';
+      return;
+    }
+
+    if (isOther && personName.length < 2) {
+      feedback.textContent = 'Ingresá un nombre válido.';
+      return;
+    }
+
+    isSubmitting = true;
+    submitButton.disabled = true;
+    submitButton.textContent = 'ENVIANDO...';
+
+    feedback.textContent = '';
+
+    try {
+
+      /* ACTUALIZAR DATOS ANTES DE GUARDAR */
+
+      await fetchReservations();
+
+      /* EVITAR RESERVAS DUPLICADAS */
+
+      if (isNameTaken(personName)) {
+        feedback.textContent =
+          'Este personaje ya está reservado u ocupado.';
+
+        await renderCards();
+        return;
+      }
+
+      let result;
+
+      if (isOther) {
+
+        /* GUARDAR CARITAS OCCIDENTALES */
+
+        result = await supabaseClient
+          .from('other_reservations')
+          .insert([
+            {
+              person_name: personName
+            }
+          ]);
+
+      } else {
+
+        /* BUSCAR EL GRUPO DEL PERSONAJE */
+
+        const characterGroup = Object.entries(groups)
+          .find(([group, members]) =>
+            group && members.includes(personName)
+          );
+
+        if (!characterGroup) {
+          throw new Error('No se encontró el grupo del personaje.');
+        }
+
+        /* GUARDAR RESERVA DE IDOL */
+
+        result = await supabaseClient
+          .from('idol_reservations')
+          .insert([
+            {
+              character_name: personName,
+              fandom: characterGroup[0],
+              nickname: nickname,
+              contact_number: contactNumber
+            }
+          ]);
+      }
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      feedback.textContent =
+        '¡Tu solicitud fue enviada correctamente! ♡';
+
+      feedback.style.color = '#4d7049';
+
+      await fetchReservations();
+      await renderCards();
+
+      setTimeout(() => {
+        dialog.close();
+      }, 1400);
+
+    } catch (error) {
+
+      console.error('Error al guardar reserva:', error);
+
+      feedback.textContent =
+        'No se pudo completar la reserva. Intentá nuevamente.';
+
+      feedback.style.color = '#a52f48';
+
+    } finally {
+
+      isSubmitting = false;
+      submitButton.disabled = false;
+      submitButton.textContent = 'SOLICITAR';
+
+    }
+  }
+);
+
+/* ACTUALIZAR FILTROS */
+
+search.addEventListener('input', renderCards);
+fandom.addEventListener('change', renderCards);
+availability.addEventListener('change', renderCards);
+
+/* NAVEGACIÓN ACTIVA */
+
+const navLinks = document.querySelectorAll('nav a');
+
+const sections = document.querySelectorAll(
+  '#home, #reservations, #rules, #occupied'
+);
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.toggle(
+          'active',
+          link.getAttribute('href') === `#${entry.target.id}`
+        );
+      });
+    }
+  });
+}, {
+  threshold: 0.25
+});
+
+sections.forEach(section => observer.observe(section));
+
+/* INICIAR PÁGINA */
+
+renderCards();
+</script>
+
+</body>
+</html>
+
       
