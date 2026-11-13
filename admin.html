@@ -102,6 +102,15 @@
 
       <div id="officialRolesList">Cargando roles...</div>
     </section>
+<section class="panel">
+  <h2>♡ Buscar reservas</h2>
+  <input
+    id="reservationSearch"
+    type="search"
+    placeholder="Buscar por nombre o número de teléfono..."
+  >
+  <p class="muted">Podés buscar idols y caritas occidentales.</p>
+</section>
 
     <section class="panel">
       <h2>Reservas de idols</h2>
@@ -240,14 +249,91 @@ async function loadOfficialRoles() {
     return el;
   }
 
-  function renderReservations(containerId, rows, type) {
-    const container = $(containerId);
-    container.replaceChildren();
+  
+function renderReservations(containerId, rows, type) {
+  const container = $(containerId);
+  container.replaceChildren();
 
-    if (!rows.length) {
-      addText(container, 'p', 'Todavía no hay reservas.');
-      return;
+  const term = $('reservationSearch').value.trim().toLowerCase();
+  const normalizedTerm = term.replace(/[\s-]/g, '');
+
+  const filteredRows = rows.filter(row => {
+    const name = type === 'idol'
+      ? row.character_name
+      : row.person_name;
+
+    const phone = (row.contact_number || '').toLowerCase();
+    const normalizedPhone = phone.replace(/[\s-]/g, '');
+
+    return (
+      (name || '').toLowerCase().includes(term) ||
+      phone.includes(term) ||
+      normalizedPhone.includes(normalizedTerm)
+    );
+  });
+
+  if (!filteredRows.length) {
+    addText(
+      container,
+      'p',
+      term ? 'No se encontraron reservas.' : 'Todavía no hay reservas.'
+    );
+    return;
+  }
+
+  filteredRows.forEach(row => {
+    const card = document.createElement('article');
+    card.className = 'reservation';
+
+    if (type === 'idol') {
+      addText(card, 'h3', row.character_name);
+      addText(card, 'p', 'Fandom: ' + (row.fandom || '—'));
+      addText(card, 'p', 'Nickname: ' + (row.nickname || '—'));
+    } else {
+      addText(card, 'h3', row.person_name);
     }
+
+    addText(card, 'p', 'Contacto: ' + (row.contact_number || '—'));
+    addText(
+      card,
+      'p',
+      'Fecha: ' + (row.created_at
+        ? new Date(row.created_at).toLocaleString()
+        : '—')
+    );
+
+    const del = document.createElement('button');
+    del.className = 'delete';
+    del.textContent = 'Eliminar reserva';
+
+    del.addEventListener('click', async () => {
+      if (!confirm('¿Querés eliminar esta reserva?')) return;
+
+      del.disabled = true;
+      const table = type === 'idol'
+        ? 'idol_reservations'
+        : 'other_reservations';
+
+      const { error } = await db
+        .from(table)
+        .delete()
+        .eq('id', row.id);
+
+      if (error) {
+        status('No se pudo eliminar la reserva: ' + error.message);
+        del.disabled = false;
+        return;
+      }
+
+      status('Reserva eliminada.');
+      await loadReservations();
+    });
+
+    card.appendChild(del);
+    container.appendChild(card);
+  });
+}
+
 
     rows.forEach(row => {
       const card = document.createElement('article');
@@ -302,6 +388,9 @@ async function loadOfficialRoles() {
     });
   }
 
+$('reservationSearch').addEventListener('input', () => {
+  loadReservations();
+});
   async function loadReservations() {
     status('Cargando reservas...');
 
