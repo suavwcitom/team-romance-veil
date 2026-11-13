@@ -395,18 +395,34 @@ $('reservationSearch').addEventListener('input', () => {
   }
 
   $('loginForm').addEventListener('submit', async event => {
-    event.preventDefault();
-    if (busy) return;
+  event.preventDefault();
+  if (busy) return;
 
-    busy = true;
-    $('loginButton').disabled = true;
-    status('Iniciando sesión...');
+  busy = true;
+  $('loginButton').disabled = true;
+  status('Iniciando sesión...');
 
+  try {
     const { error } = await db.auth.signInWithPassword({
       email: $('email').value.trim(),
       password: $('password').value
     });
 
+    if (error) {
+      status('ERROR DE INICIO DE SESIÓN: ' + error.message);
+      return;
+    }
+
+    await checkSession();
+
+  } catch (error) {
+    status('ERROR: ' + error.message);
+
+  } finally {
+    busy = false;
+    $('loginButton').disabled = false;
+  }
+});
     busy = false;
     $('loginButton').disabled = false;
 
