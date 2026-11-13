@@ -787,8 +787,8 @@ async function fetchReservations() {
       .select('id, person_name'),
 
     supabaseClient
-      .from('roles')
-      .select('character_name, fandom')
+ .from('oficial_roles')
+.select('character_name, fandom')
   ]);
 
   if (idolResult.error) throw idolResult.error;
