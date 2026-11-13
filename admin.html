@@ -131,9 +131,8 @@
     const container = $('officialRolesList');
     container.textContent = 'Cargando roles...';
 
-    const { data, error } = await db
-      .from('official_roles')
-      .select('id, character_name, fandom, created_at')
+    const { data, error } = await db.from('other_reservations')
+  .select('id, person_name, contact_number, created_at')
       .order('created_at', { ascending: false });
 
     if (error) {
