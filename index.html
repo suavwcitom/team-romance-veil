@@ -780,7 +780,7 @@ async function fetchReservations() {
   ] = await Promise.all([
     supabaseClient
       .from('idol_reservations')
-      .select('id, character_name, fandom')
+      .select('id, character_name, fandom'),
 
     supabaseClient
       .from('other_reservations')
