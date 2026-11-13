@@ -165,7 +165,7 @@
         del.disabled = true;
 
         const { error: deleteError } = await db
-          .from('official_roles')
+          .from('roles')
           .delete()
           .eq('id', role.id);
 
