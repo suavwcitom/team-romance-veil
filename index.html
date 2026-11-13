@@ -780,7 +780,7 @@ async function fetchReservations() {
   ] = await Promise.all([
     supabaseClient
       .from('idol_reservations')
-      .select('id, character_name'),
+      .select('id, character_name, fandom')
 
     supabaseClient
       .from('other_reservations')
@@ -916,25 +916,54 @@ async function renderCards() {
 
 
 
+
 async function renderOccupied() {
   const occupiedList = document.getElementById('occupiedList');
-
   if (!occupiedList) return;
 
-  const rows = currentOfficialRoles
-    .filter(row => row.character_name)
-    .map(row => ({
-      name: row.character_name,
-      detail: row.fandom
-        ? `${row.fandom} · Ocupado oficialmente`
-        : 'Ocupado oficialmente'
-    }));
+  const rows = [
+    ...currentOfficialRoles
+      .filter(row => row.character_name)
+      .map(row => ({
+        name: row.character_name,
+        fandom: row.fandom || '',
+        status: 'Ocupado oficialmente'
+      })),
+
+    ...currentReservations
+      .filter(row => row.character_name)
+      .map(row => ({
+        name: row.character_name,
+        fandom: row.fandom || '',
+        status: 'Reservado'
+      })),
+
+    ...currentOtherReservations
+      .filter(row => row.person_name)
+      .map(row => ({
+        name: row.person_name,
+        fandom: '',
+        status: 'Reservado'
+      }))
+  ];
 
   const unique = [];
 
   rows.forEach(row => {
-    if (!unique.some(item => namesMatch(item.name, row.name))) {
-      unique.push(row);
+    const existing = unique.find(item =>
+      namesMatch(item.name, row.name)
+    );
+
+    if (existing) {
+      if (!existing.status.includes(row.status)) {
+        existing.status += ' · ' + row.status;
+      }
+
+      if (!existing.fandom && row.fandom) {
+        existing.fandom = row.fandom;
+      }
+    } else {
+      unique.push({ ...row });
     }
   });
 
@@ -943,13 +972,15 @@ async function renderOccupied() {
   if (!unique.length) {
     occupiedList.innerHTML = `
       <p class="occupied-empty">
-        Todavía no hay roles ocupados.
+        Todavía no hay roles ocupados ni reservados.
       </p>
     `;
     return;
   }
 
-  unique.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  unique.sort((a, b) =>
+    a.name.localeCompare(b.name, 'es')
+  );
 
   unique.forEach(row => {
     const item = document.createElement('div');
@@ -957,7 +988,10 @@ async function renderOccupied() {
     item.textContent = row.name;
 
     const small = document.createElement('small');
-    small.textContent = row.detail;
+    small.textContent = [
+      row.fandom,
+      row.status
+    ].filter(Boolean).join(' · ');
 
     item.appendChild(small);
     occupiedList.appendChild(item);
