@@ -688,10 +688,12 @@ function namesMatch(a, b) {
 
   if (!nameA || !nameB) return false;
 
+  const wordsA = [...new Set(nameA.split(' '))];
+  const wordsB = [...new Set(nameB.split(' '))];
+
   return (
-    nameA === nameB ||
-    nameA.startsWith(nameB + ' ') ||
-    nameB.startsWith(nameA + ' ')
+    wordsA.every(word => wordsB.includes(word)) ||
+    wordsB.every(word => wordsA.includes(word))
   );
 }
 
