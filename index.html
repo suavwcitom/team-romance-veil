@@ -369,6 +369,8 @@ dialog {
   padding:25px;
   width:min(420px,calc(100% - 30px));
   border-radius:4px;
+  max-height:90vh;
+  overflow-y:auto;
 }
 
 dialog::backdrop {background:#38172088}
@@ -438,723 +440,740 @@ dialog input {
 <body>
 
 <header class="topbar">
-  <a href="#home" class="brand" style="text-decoration:none">
+  <div class="brand">
     ROMANCE VEIL
-    <small>CHARACTER RESERVATIONS</small>
-  </a>
+    <small>FIND YOUR PLACE</small>
+  </div>
 
   <nav>
-    <a href="#home">Home</a>
+    <a href="#home" class="active">Home</a>
     <a href="#reservations">Reservations</a>
     <a href="#rules">Rules</a>
-    <a href="#occupied">Ocupados</a>
+    <a href="#occupied">Occupied</a>
   </nav>
 </header>
 
-<main>
-
 <section class="hero" id="home">
-  <div class="eyebrow">The best place to find love 💌</div>
-
-  <h1>Love is in<br>the <em>details.</em></h1>
-
-  <p>
-    Únete hoy mismo y realiza tu reserva de forma segura,
-    solo selecciona tu rol deseado y agrega tu nombre y número de teléfono.
-  </p>
-
-  <a class="main-btn" href="#reservations">EXPLORE CHARACTERS</a>
-
-  <div class="ornament">ㅤ𐫱𐫱࣭ᨗㅤ</div>
+  <div class="eyebrow">A place for everyone</div>
+  <h1>The best place<br>to find <em>love.</em></h1>
+  <p>Encontrá tu lugar, elegí tu personaje y reservá tu espacio en nuestra pequeña comunidad.</p>
+  <a href="#reservations" class="main-btn">FIND YOUR ROLE ♡</a>
+  <div class="ornament">♡</div>
 </section>
 
-<section class="section" id="reservations">
-
-  <div class="section-head">
-    <div class="eyebrow">Find your muse</div>
-    <h2>The reservation room</h2>
-    <p>
-      Buscá tu idol o carita occidental favorito/a
-      y descubrí si todavía está disponible.
-    </p>
-  </div>
-
-  <div class="filters">
-    <input id="search" type="search" placeholder="Buscar personaje...">
-
-    <select id="Fandom">
-      <option value="">Todos los grupos</option>
-      <option value="ENHYPEN">ENHYPEN</option>
-      <option value="TXT">TXT</option>
-      <option value="Stray Kids">Stray Kids</option>
-      <option value="ATEEZ">ATEEZ</option>
-      <option value="SEVENTEEN">SEVENTEEN</option>
-      <option value="RIIZE">RIIZE</option>
-      <option value="ZEROBASEONE">ZEROBASEONE (ZB1)</option>
-      <option value="BOYNEXTDOOR">BOYNEXTDOOR</option>
-      <option value="TWS">TWS</option>
-      <option value="TREASURE">TREASURE</option>
-      <option value="P1Harmony">P1Harmony</option>
-      <option value="NCT">NCT</option>
-      <option value="EXO">EXO</option>
-      <option value="MONSTA X">MONSTA X</option>
-      <option value="GOT7">GOT7</option>
-      <option value="The Boyz">The Boyz</option>
-      <option value="BIGBANG">BIGBANG</option>
-      <option value="SHINee">SHINee</option>
-      <option value="Super Junior">Super Junior</option>
-      <option value="Day6">Day6</option>
-      <option value="NewJeans">NewJeans</option>
-      <option value="IVE">IVE</option>
-      <option value="LE SSERAFIM">LE SSERAFIM</option>
-      <option value="aespa">aespa</option>
-      <option value="BABYMONSTER">BABYMONSTER</option>
-      <option value="ILLIT">ILLIT</option>
-      <option value="KISS OF LIFE">KISS OF LIFE</option>
-      <option value="NMIXX">NMIXX</option>
-      <option value="BLACKPINK">BLACKPINK</option>
-      <option value="TWICE">TWICE</option>
-      <option value="Red Velvet">Red Velvet</option>
-      <option value="ITZY">ITZY</option>
-      <option value="(G)I-DLE">(G)I-DLE</option>
-      <option value="MAMAMOO">MAMAMOO</option>
-      <option value="STAYC">STAYC</option>
-      <option value="Girls' Generation">Girls' Generation (SNSD)</option>
-      <option value="2NE1">2NE1</option>
-      <option value="CORTIS">CORTIS</option>
-    </select>
-
-    <select id="availability">
-      <option value="">Todos los estados</option>
-      <option value="available">Disponibles</option>
-      <option value="taken">Reservados</option>
-    </select>
-  </div>
-
-  <button type="button" id="reserveOtherButton">
-    Otro · Celebridades occidentales / otro
-  </button>
-
-  <div class="grid" id="characterGrid">
-    <div class="empty" id="empty">
-      No encontramos personajes con esa búsqueda.
+<main>
+  <section class="section" id="reservations">
+    <div class="section-head">
+      <div class="eyebrow">Choose your character</div>
+      <h2>Reservations</h2>
+      <p>Elegí el personaje que querés reservar y comprobá su disponibilidad.</p>
     </div>
-  </div>
 
-</section>
+    <div class="filters">
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="Search for a character..."
+      >
 
-<section class="rules" id="rules">
-  <div class="eyebrow">Before you reserve</div>
-  <h2>A little note for you</h2>
+      <select id="groupFilter">
+        <option value="">All groups</option>
+      </select>
 
-  <p>Revisá la disponibilidad antes de solicitar una reserva.
+      <select id="statusFilter">
+        <option value="">All roles</option>
+        <option value="available">Available</option>
+        <option value="taken">Occupied</option>
+      </select>
+    </div>
+
+    <button id="reserveOtherButton" type="button">
+      Reserve a western face ♡
+    </button>
+
+    <div class="grid" id="rolesGrid">
+      <div class="empty" id="emptyMessage">
+        No characters found.
+      </div>
+    </div>
+  </section>
+
+  <section class="rules" id="rules">
+    <div class="eyebrow">Before you reserve</div>
+    <h2>A little note for you</h2>
+
+    <p>Revisá la disponibilidad antes de solicitar una reserva.
 
 Se permiten caritas occidentales. Si el rol que deseás reservar no aparece en la lista, podés anotarlo en la sección «Caritas occidentales / otro» para solicitarlo.
 
-No se permiten reservas de idols fallecidos, integrantes de BTS ni idols involucrados en polémicas.
+No se permiten reservas de idols que ya estén ocupados. Respetá las reservas de los demás integrantes.</p>
+  </section>
 
-Antes de enviar tu solicitud, asegurate de completar los datos correspondientes y de verificar que el rol esté disponible.</p>
-</section>
+  <section class="section" id="occupied">
+    <div class="section-head">
+      <div class="eyebrow">Already reserved</div>
+      <h2>Occupied roles</h2>
+      <p>Estos son los personajes que ya tienen una reserva.</p>
+    </div>
 
-<section class="section rules" id="occupied">
-  <div class="section-head">
-    <div class="eyebrow">Officially taken</div>
-    <h2>Roles ocupados</h2>
-    <p>
-      Estos roles ya están siendo utilizados oficialmente
-      y no se encuentran disponibles para otras personas.
-    </p>
-  </div>
-
-  <div id="occupiedList" class="occupied-list">
-    <p class="occupied-empty">
-      Próximamente se agregarán los roles ocupados.
-    </p>
-  </div>
-</section>
-
+    <div class="occupied-list" id="occupiedList">
+      <div class="occupied-empty">Loading reservations...</div>
+    </div>
+  </section>
 </main>
 
 <footer>
-  ROMANCE VEIL ♡ MADE WITH LOVE BY AËRVEN
+  ROMANCE VEIL ♡ MADE WITH LOVE
 </footer>
 
-<dialog id="reserveDialog">
-  <div class="eyebrow">A new little story</div>
-  <h2>Reserve your character</h2>
+<dialog id="reservationDialog">
+  <h2 id="dialogTitle">Reserve your role ♡</h2>
 
-  <p id="chosenCharacter"></p>
+  <form id="reservationForm">
+    <input type="hidden" id="selectedCharacter">
 
-  <form id="reserveForm">
-
-    <div id="otherPersonField" hidden>
-      <label for="otherPersonName">
-        Nombre de la persona occidental
-      </label>
-
+    <div id="normalFields">
+      <label for="nickname">Your nickname</label>
       <input
-        id="otherPersonName"
-        name="otherPersonName"
-        maxlength="100"
-        placeholder="¡Escribe tu carita occidental, influencer, etc aquí!"
+        type="text"
+        id="nickname"
+        placeholder="Your nickname"
+        required
       >
-
-      <p id="otherPersonStatus" aria-live="polite"></p>
     </div>
 
-    <label for="nickname">Tu nombre o nickname</label>
+    <label for="contactNumber">Contact number</label>
     <input
-      id="nickname"
-      name="nickname"
-      maxlength="40"
+      type="text"
+      id="contactNumber"
+      placeholder="Your contact number"
       required
-      placeholder="¿Cómo te llamás?"
     >
 
-    <label for="Number">Tu número de contacto</label>
-    <input
-      id="Number"
-      name="Number"
-      maxlength="80"
-      required
-      placeholder="+ *****"
-    >
+    <div id="otherFields" hidden>
+      <label for="otherPerson">Western face / other</label>
+      <input
+        type="text"
+        id="otherPerson"
+        placeholder="Write the person's name"
+      >
+      <p id="otherPersonStatus"></p>
+    </div>
+
+    <p id="feedback"></p>
 
     <div class="form-actions">
-      <button class="main-btn" id="submitButton" type="submit">
-        SOLICITAR
+      <button class="main-btn" type="submit" id="submitReservation">
+        Confirm
       </button>
 
-      <button class="cancel" type="button" id="cancelBtn">
-        CANCELAR
+      <button class="cancel" type="button" id="closeDialog">
+        Cancel
       </button>
     </div>
-
-    <p id="feedback" aria-live="polite"></p>
-
   </form>
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
+
 const SUPABASE_URL = 'https://xgtxfkbhdgpuarxhzajk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable__kHbGsl9xYFW8D5dAk6bIQ_5kk2g8XX';
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const characterGrid = document.getElementById('characterGrid');
-const search = document.getElementById('search');
-const fandom = document.getElementById('Fandom');
-const availability = document.getElementById('availability');
+const rolesGrid = document.getElementById('rolesGrid');
+const emptyMessage = document.getElementById('emptyMessage');
+const searchInput = document.getElementById('searchInput');
+const groupFilter = document.getElementById('groupFilter');
+const statusFilter = document.getElementById('statusFilter');
 
-const dialog = document.getElementById('reserveDialog');
-const chosen = document.getElementById('chosenCharacter');
+const dialog = document.getElementById('reservationDialog');
+const reservationForm = document.getElementById('reservationForm');
+const selectedCharacter = document.getElementById('selectedCharacter');
+const nicknameInput = document.getElementById('nickname');
+const contactInput = document.getElementById('contactNumber');
+const otherInput = document.getElementById('otherPerson');
+const otherFields = document.getElementById('otherFields');
 const feedback = document.getElementById('feedback');
-const empty = document.getElementById('empty');
+const otherPersonStatus = document.getElementById('otherPersonStatus');
 
-const otherField = document.getElementById('otherPersonField');
-const otherInput = document.getElementById('otherPersonName');
-const otherStatus = document.getElementById('otherPersonStatus');
-
-const submitButton = document.getElementById('submitButton');
-
-let selectedCharacter = '';
-let isSubmitting = false;
-
-let currentReservations = [];
-let currentOtherReservations = [];
+let idolReservations = [];
+let otherReservations = [];
 let currentOfficialRoles = [];
+let allEntries = [];
+let isOtherReservation = false;
+let searchVersion = 0;
 
-/* NORMALIZACIÓN DE NOMBRES */
+const groups = {
+  'ENHYPEN': [
+    'Jungwon','Heeseung','Jay','Jake','Sunghoon','Sunoo','Ni-ki'
+  ],
+  'TXT': [
+    'Soobin','Yeonjun','Beomgyu','Taehyun','Huening Kai'
+  ],
+  'Stray Kids': [
+    'Bang Chan','Lee Know','Changbin','Hyunjin',
+    'Han','Felix','Seungmin','I.N'
+  ],
+  'ATEEZ': [
+    'Hongjoong','Seonghwa','Yunho','Yeosang',
+    'San','Mingi','Wooyoung','Jongho'
+  ],
+  'SEVENTEEN': [
+    'S.Coups','Jeonghan','Joshua','Jun','Hoshi',
+    'Wonwoo','Woozi','DK','Mingyu','The8',
+    'Seungkwan','Vernon','Dino'
+  ],
+  'RIIZE': [
+    'Shotaro','Eunseok','Sungchan','Wonbin','Sohee','Anton'
+  ],
+  'BOYNEXTDOOR': [
+    'Sungho','Riwoo','Jaehyun','Taesan','Leehan','Woonhak'
+  ],
+  'TWS': [
+    'Shinyu','Dohoon','Youngjae','Hanjin','Jihoon','Kyungmin'
+  ],
+  'TREASURE': [
+    'Hyunsuk','Jihoon','Yoshi','Junkyu','Mashiho',
+    'Jaehyuk','Asahi','Yedam','Doyoung','Haruto',
+    'Jeongwoo','Junghwan'
+  ],
+  'P1Harmony': [
+    'Keeho','Theo','Jiung','Intak','Soul','Jongseob'
+  ],
+  'NCT': [
+    'Taeyong','Johnny','Yuta','Kun','Doyoung','Ten',
+    'Jaehyun','Winwin','Jungwoo','Mark','Xiaojun',
+    'Hendery','Renjun','Jeno','Haechan','Jaemin',
+    'Yangyang','Chenle','Jisung'
+  ],
+  'EXO': [
+    'Xiumin','Suho','Lay','Baekhyun','Chen',
+    'Chanyeol','D.O.','Kai','Sehun'
+  ],
+  'MONSTA X': [
+    'Shownu','Minhyuk','Kihyun','Hyungwon','Joohoney','I.M'
+  ],
+  'GOT7': [
+    'Jay B','Mark','Jackson','Jinyoung','Youngjae','BamBam','Yugyeom'
+  ],
+  'The Boyz': [
+    'Sangyeon','Jacob','Younghoon','Hyunjae','Juyeon',
+    'Kevin','New','Q','Ju Haknyeon','Sunwoo','Eric'
+  ],
+  'BIGBANG': [
+    'G-Dragon','Taeyang','Daesung'
+  ],
+  'SHINee': [
+    'Onew','Key','Minho','Taemin'
+  ],
+  'Super Junior': [
+    'Leeteuk','Heechul','Yesung','Shindong','Eunhyuk',
+    'Donghae','Siwon','Ryeowook','Kyuhyun'
+  ],
+  'DAY6': [
+    'Sungjin','Young K','Wonpil','Dowoon'
+  ],
+  'NewJeans': [
+    'Minji','Hanni','Danielle','Haerin','Hyein'
+  ],
+  'IVE': [
+    'Yujin','Gaeul','Rei','Wonyoung','Liz','Leeseo'
+  ],
+  'LE SSERAFIM': [
+    'Sakura','Chaewon','Yunjin','Kazuha','Eunchae'
+  ],
+  'aespa': [
+    'Karina','Giselle','Winter','Ningning'
+  ],
+  'BABYMONSTER': [
+    'Ruka','Pharita','Asa','Ahyeon','Rami','Rora','Chiquita'
+  ],
+  'ILLIT': [
+    'Yunah','Minju','Moka','Wonhee','Iroha'
+  ],
+  'KISS OF LIFE': [
+    'Julie','Natty','Belle','Haneul'
+  ],
+  'NMIXX': [
+    'Lily','Haewon','Sullyoon','Bae','Jiwoo','Kyujin'
+  ],
+  'BLACKPINK': [
+    'Jisoo','Jennie','Rosé','Lisa'
+  ],
+  'TWICE': [
+    'Nayeon','Jeongyeon','Momo','Sana','Jihyo',
+    'Mina','Dahyun','Chaeyoung','Tzuyu'
+  ],
+  'Red Velvet': [
+    'Irene','Seulgi','Wendy','Joy','Yeri'
+  ],
+  'ITZY': [
+    'Yeji','Lia','Ryujin','Chaeryeong','Yuna'
+  ],
+  '(G)I-DLE': [
+    'Miyeon','Minnie','Soyeon','Yuqi','Shuhua'
+  ],
+  'MAMAMOO': [
+    'Solar','Moonbyul','Wheein','Hwasa'
+  ],
+  'STAYC': [
+    'Sumin','Sieun','Isa','Seeun','Yoon','J'
+  ],
+  'SNSD': [
+    'Taeyeon','Sunny','Tiffany','Hyoyeon',
+    'Yuri','Sooyoung','Yoona','Seohyun'
+  ],
+  '2NE1': [
+    'CL','Bom','Dara','Minzy'
+  ],
+  'CORTIS': [
+    'Martin','James','Juhoon','Seonghyeon','Keonho'
+  ]
+};
 
 function normalizePersonName(name) {
   return String(name || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .trim()
-    .replace(/\s+/g, ' ');
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
-/* COMPARACIÓN DE NOMBRES COMPLETOS Y ABREVIADOS */
+function namesMatch(first, second) {
+  const a = normalizePersonName(first);
+  const b = normalizePersonName(second);
 
-function namesMatch(a, b) {
-  const nameA = normalizePersonName(a);
-  const nameB = normalizePersonName(b);
+  if (!a || !b) return false;
+  if (a === b) return true;
 
-  if (!nameA || !nameB) return false;
-
-  return (
-    nameA === nameB ||
-    nameA.startsWith(nameB) ||
-    nameB.startsWith(nameA)
-  );
+  return a.startsWith(b + ' ') || b.startsWith(a + ' ');
 }
-
-/* PROTECCIÓN PARA MOSTRAR TEXTO */
 
 function escapeHTML(value) {
   return String(value ?? '').replace(/[&<>"']/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
   })[char]);
 }
 
-/* GRUPOS E INTEGRANTES */
-
-const groups = {
-  'ENHYPEN': ['Jungwon','Heeseung','Jay','Jake','Sunghoon','Sunoo','Ni-ki'],
-  'TXT': ['Soobin','Yeonjun','Beomgyu','Taehyun','Huening Kai'],
-  'Stray Kids': ['Bang Chan','Lee Know','Changbin','Hyunjin','Han','Felix','Seungmin','I.N'],
-  'ATEEZ': ['Hongjoong','Seonghwa','Yunho','Yeosang','San','Mingi','Wooyoung','Jongho'],
-  'SEVENTEEN': ['S.Coups','Jeonghan','Joshua','Jun','Hoshi','Wonwoo','Woozi','DK','Mingyu','The8','Seungkwan','Vernon','Dino'],
-  'RIIZE': ['Shotaro','Eunseok','Sungchan','Wonbin','Sohee','Anton'],
-  'ZEROBASEONE': ['Sung Hanbin','Kim Jiwoong','Zhang Hao','Seok Matthew','Kim Taerae','Ricky','Kim Gyuvin','Park Gunwook','Han Yujin'],
-  'BOYNEXTDOOR': ['Sungho','Riwoo','Jaehyun','Taesan','Leehan','Woonhak'],
-  'TWS': ['Shinyu','Dohoon','Youngjae','Hanjin','Jihoon','Kyungmin'],
-  'TREASURE': ['Choi Hyunsuk','Jihoon','Yoshi','Junkyu','Mashiho','Jaehyuk','Asahi','Yedam','Doyoung','Haruto','Jeongwoo','Junghwan'],
-  'P1Harmony': ['Keeho','Theo','Jiung','Intak','Soul','Jongseob'],
-  'NCT': ['Johnny','Taeyong','Yuta','Kun','Doyoung','Ten','Jaehyun','Winwin','Jungwoo','Mark','Xiaojun','Hendery','Renjun','Jeno','Haechan','Jaemin','Yangyang','Shotaro','Sungchan','Chenle','Jisung','Sion','Riku','Yushi','Jaehee','Ryo','Sakuya'],
-  'EXO': ['Xiumin','Suho','Lay','Baekhyun','Chen','Chanyeol','D.O.','Kai','Sehun'],
-  'MONSTA X': ['Shownu','Minhyuk','Kihyun','Hyungwon','Joohoney','I.M'],
-  'GOT7': ['Jay B','Mark','Jackson','Jinyoung','Youngjae','BamBam','Yugyeom'],
-  'The Boyz': ['Sangyeon','Jacob','Younghoon','Hyunjae','Juyeon','Kevin','New','Q','Sunwoo','Eric'],
-  'BIGBANG': ['G-Dragon','Taeyang','Daesung','T.O.P'],
-  'SHINee': ['Onew','Key','Minho','Taemin','Jonghyun'],
-  'Super Junior': ['Leeteuk','Heechul','Yesung','Shindong','Eunhyuk','Siwon','Donghae','Ryeowook','Kyuhyun'],
-  'Day6': ['Sungjin','Young K','Wonpil','Dowoon'],
-  'NewJeans': ['Minji','Hanni','Danielle','Haerin','Hyein'],
-  'IVE': ['Yujin','Gaeul','Rei','Wonyoung','Liz','Leeseo'],
-  'LE SSERAFIM': ['Sakura','Kim Chaewon','Huh Yunjin','Kazuha','Hong Eunchae'],
-  'aespa': ['Karina','Giselle','Winter','Ningning'],
-  'BABYMONSTER': ['Ruka','Pharita','Asa','Ahyeon','Rami','Rora','Chiquita'],
-  'ILLIT': ['Yunah','Minju','Moka','Wonhee','Iroha'],
-  'KISS OF LIFE': ['Julie','Natty','Belle','Haneul'],
-  'NMIXX': ['Lily','Haewon','Sullyoon','Bae','Jiwoo','Kyujin'],
-  'BLACKPINK': ['Jisoo','Jennie','Rosé','Lisa'],
-  'TWICE': ['Nayeon','Jeongyeon','Momo','Sana','Jihyo','Mina','Dahyun','Chaeyoung','Tzuyu'],
-  'Red Velvet': ['Irene','Seulgi','Wendy','Joy','Yeri'],
-  'ITZY': ['Yeji','Lia','Ryujin','Chaeryeong','Yuna'],
-  '(G)I-DLE': ['Miyeon','Minnie','Soyeon','Yuqi','Shuhua'],
-  'MAMAMOO': ['Solar','Moonbyul','Wheein','Hwasa'],
-  'STAYC': ['Sumin','Sieun','Isa','Seeun','Yoon','J'],
-  "Girls' Generation": ['Taeyeon','Sunny','Tiffany','Hyoyeon','Yuri','Sooyoung','Yoona','Seohyun'],
-  '2NE1': ['CL','Bom','Dara','Minzy'],
-  'CORTIS': ['Martin','James','Juhoon','Seonghyeon','Keonho']
-};
-
-/* OBTENER RESERVAS */
-
 async function fetchReservations() {
-  const [
-    idolResult,
-    otherResult,
-    officialResult
-  ] = await Promise.all([
-    supabaseClient
-      .from('idol_reservations')
-      .select('id, character_name'),
+  const [idolsResult, othersResult, officialResult] =
+    await Promise.all([
+      db.from('idol_reservations')
+        .select('character_name, fandom, nickname'),
 
-    supabaseClient
-      .from('other_reservations')
-      .select('id, person_name'),
+      db.from('other_reservations')
+        .select('person_name'),
 
-    supabaseClient
-      .from('official_roles')
-      .select('character_name, fandom')
-  ]);
+      db.from('roles')
+        .select('character_name, fandom')
+    ]);
 
-  if (idolResult.error) throw idolResult.error;
-  if (otherResult.error) throw otherResult.error;
-  if (officialResult.error) throw officialResult.error;
+  if (idolsResult.error) throw idolsResult.error;
+  if (othersResult.error) throw othersResult.error;
 
-  currentReservations = idolResult.data || [];
-  currentOtherReservations = otherResult.data || [];
-  currentOfficialRoles = officialResult.data || [];
-}
+  idolReservations = idolsResult.data || [];
+  otherReservations = othersResult.data || [];
 
-/* COMPROBAR SI UN NOMBRE ESTÁ OCUPADO */
-
-function isNameTaken(name) {
-  const allNames = [
-    ...currentReservations.map(row => row.character_name),
-    ...currentOtherReservations.map(row => row.person_name),
-    ...currentOfficialRoles.map(row => row.character_name)
-  ];
-
-  return allNames.some(existingName =>
-    namesMatch(existingName, name)
-  );
-}
-
-/* RENDERIZAR TARJETAS */
-
-async function renderCards() {
-  try {
-    await fetchReservations();
-
-    const selectedGroup = fandom.value;
-    const term = normalizePersonName(search.value);
-    const statusFilter = availability.value;
-
-    const idolEntries = Object.entries(groups)
-      .filter(([group]) => !selectedGroup || group === selectedGroup)
-      .flatMap(([group, members]) =>
-        members.map((name, index) => ({
-          name,
-          group,
-          index
-        }))
-      )
-
-  .filter(({name, group}) =>
-    !term ||
-    normalizePersonName(name).includes(term) ||
-    normalizePersonName(group).includes(term)
-  );
-
-    const entries = idolEntries.map(entry => ({
-      ...entry,
-      status: isNameTaken(entry.name) ? 'taken' : 'available'
-    })).filter(({status}) =>
-      !statusFilter || status === statusFilter
-    );
-
-    characterGrid.innerHTML = '';
-
-    entries.forEach(({name, group, status}) => {
-      const card = document.createElement('article');
-      card.className = 'card';
-
-      card.innerHTML = `
-        <div class="card-art">
-          ${escapeHTML(name.charAt(0))}
-          <span>ROMANCE VEIL</span>
-        </div>
-
-        <div class="card-info">
-          <h3>${escapeHTML(name)}</h3>
-          <div class="fandom">${escapeHTML(group)}</div>
-
-          <span class="status ${status}">
-            ${status === 'taken' ? 'Reservado' : 'Disponible'}
-          </span>
-
-          <button
-            class="reserve-btn"
-            type="button"
-            ${status === 'taken' ? 'disabled' : ''}
-          >
-            ${status === 'taken' ? 'NO DISPONIBLE' : 'RESERVAR'}
-          </button>
-        </div>
-      `;
-
-      const button = card.querySelector('.reserve-btn');
-
-      button.addEventListener('click', () => {
-        openReservation(name, false);
-      });
-
-      characterGrid.appendChild(card);
-    });
-
-    if (entries.length === 0) {
-      characterGrid.innerHTML = `
-        <div class="empty" style="display:block">
-          No encontramos personajes con esa búsqueda.
-        </div>
-      `;
-    }
-
-    renderOccupied();
-
-  } catch (error) {
-    console.error('Error al cargar reservas:', error);
-
-    characterGrid.innerHTML = `
-      <div class="empty" style="display:block">
-        No se pudieron cargar los personajes.
-        Intentá nuevamente.
-      </div>
-    `;
+  if (officialResult.error) {
+    console.warn('No se pudieron cargar los roles oficiales:', officialResult.error);
+    currentOfficialRoles = [];
+  } else {
+    currentOfficialRoles = officialResult.data || [];
   }
 }
 
-/* MOSTRAR ROLES OFICIALES OCUPADOS */
+function isNameTaken(name, reservations) {
+  return reservations.some(item =>
+    namesMatch(
+      name,
+      item.character_name || item.person_name
+    )
+  );
+}
 
-function renderOccupied() {
-  const occupiedList = document.getElementById('occupiedList');
+function getEntryStatus(entry) {
+  const officialTaken = currentOfficialRoles.some(role =>
+    namesMatch(entry.name, role.character_name) &&
+    (
+      !role.fandom ||
+      !entry.fandom ||
+      normalizePersonName(role.fandom) === normalizePersonName(entry.fandom)
+    )
+  );
 
-  const uniqueRoles = [];
+  const reserved = isNameTaken(entry.name, idolReservations);
 
-  currentOfficialRoles.forEach(role => {
-    const exists = uniqueRoles.some(item =>
-      normalizePersonName(item.character_name) ===
-      normalizePersonName(role.character_name)
-    );
+  return officialTaken || reserved ? 'taken' : 'available';
+}
 
-    if (!exists) uniqueRoles.push(role);
+function buildEntries() {
+  const entries = [];
+
+  Object.entries(groups).forEach(([group, members]) => {
+    members.forEach(name => {
+      entries.push({
+        name,
+        fandom: group,
+        type: 'idol'
+      });
+    });
   });
 
-  if (!uniqueRoles.length) {
-    occupiedList.innerHTML = `
-      <div class="occupied-empty">
-        Próximamente se agregarán los roles ocupados.
-      </div>
-    `;
+  return entries;
+}
+
+function renderCards() {
+  const search = normalizePersonName(searchInput.value);
+  const group = groupFilter.value;
+  const status = statusFilter.value;
+
+  const entries = allEntries
+    .map(entry => ({
+      ...entry,
+      status: getEntryStatus(entry)
+    }))
+    .filter(entry =>
+      (!search || normalizePersonName(entry.name).includes(search)) &&
+      (!group || entry.fandom === group) &&
+      (!status || entry.status === status)
+    );
+
+  rolesGrid.innerHTML = '';
+
+  if (!entries.length) {
+    rolesGrid.innerHTML =
+      '<div class="empty" style="display:block">No characters found.</div>';
     return;
   }
 
-  occupiedList.innerHTML = uniqueRoles.map(role => `
-    <div class="occupied-item">
-      ${escapeHTML(role.character_name)}
-      <small>${escapeHTML(role.fandom || 'Ocupado')}</small>
-    </div>
-  `).join('');
+  entries.forEach(entry => {
+    const card = document.createElement('article');
+    card.className = 'card';
+
+    const taken = entry.status === 'taken';
+
+    card.innerHTML = `
+      <div class="card-art">
+        ${escapeHTML(entry.name.charAt(0))}
+        <span>♡ ROMANCE VEIL</span>
+      </div>
+
+      <div class="card-info">
+        <h3>${escapeHTML(entry.name)}</h3>
+        <div class="fandom">${escapeHTML(entry.fandom)}</div>
+
+        <div class="status ${taken ? 'taken' : ''}">
+          ${taken ? 'OCCUPIED' : 'AVAILABLE'}
+        </div>
+
+        <button
+          class="reserve-btn"
+          type="button"
+          ${taken ? 'disabled' : ''}
+        >
+          ${taken ? 'UNAVAILABLE' : 'RESERVE ♡'}
+        </button>
+      </div>
+    `;
+
+    const button = card.querySelector('.reserve-btn');
+
+    if (!taken) {
+      button.addEventListener('click', () => {
+        openReservation(entry.name, entry.fandom, false);
+      });
+    }
+
+    rolesGrid.appendChild(card);
+  });
 }
 
-/* ABRIR FORMULARIO */
+function renderOccupied() {
+  const list = document.getElementById('occupiedList');
 
-function openReservation(name, isOther = false) {
-  selectedCharacter = name;
+  const occupied = [
+    ...idolReservations.map(item => ({
+      name: item.character_name,
+      group: item.fandom
+    })),
+    ...otherReservations.map(item => ({
+      name: item.person_name,
+      group: 'Western face / other'
+    })),
+    ...currentOfficialRoles.map(item => ({
+      name: item.character_name,
+      group: item.fandom || 'Official role'
+    }))
+  ];
 
-  otherField.hidden = !isOther;
+  const unique = [];
 
-  chosen.textContent = isOther
-    ? 'Carita occidental / otro'
-    : `Personaje seleccionado: ${name}`;
+  occupied.forEach(item => {
+    if (
+      item.name &&
+      !unique.some(existing =>
+        namesMatch(existing.name, item.name) &&
+        existing.group === item.group
+      )
+    ) {
+      unique.push(item);
+    }
+  });
 
+  if (!unique.length) {
+    list.innerHTML =
+      '<div class="occupied-empty">No occupied roles yet ♡</div>';
+    return;
+  }
+
+  list.innerHTML = unique
+    .sort((a,b) => a.name.localeCompare(b.name))
+    .map(item => `
+      <div class="occupied-item">
+        ${escapeHTML(item.name)}
+        <small>${escapeHTML(item.group)}</small>
+      </div>
+    `).join('');
+}
+
+async function refreshData() {
+  try {
+    await fetchReservations();
+    renderCards();
+    renderOccupied();
+  } catch (error) {
+    console.error('Error cargando reservas:', error);
+    rolesGrid.innerHTML =
+      '<div class="empty" style="display:block">Could not load reservations. Please try again.</div>';
+  }
+}
+
+function fillGroupFilter() {
+  groupFilter.innerHTML =
+    '<option value="">All groups</option>';
+
+  Object.keys(groups).forEach(group => {
+    const option = document.createElement('option');
+    option.value = group;
+    option.textContent = group;
+    groupFilter.appendChild(option);
+  });
+
+  const otherOption = document.createElement('option');
+  otherOption.value = 'Caritas occidentales / otro';
+  otherOption.textContent = 'Caritas occidentales / otro';
+  groupFilter.appendChild(otherOption);
+}
+
+async function checkOtherPerson() {
+  const version = ++searchVersion;
+  const name = otherInput.value.trim();
+
+  otherPersonStatus.textContent = '';
+  otherPersonStatus.style.color = '';
+
+  if (!name) return;
+
+  try {
+    const { data, error } = await db
+      .from('other_reservations')
+      .select('person_name');
+
+    if (error) throw error;
+    if (version !== searchVersion) return;
+
+    const taken = (data || []).some(item =>
+      namesMatch(name, item.person_name)
+    );
+
+    if (taken) {
+      otherPersonStatus.textContent =
+        'This person already has a reservation.';
+      otherPersonStatus.style.color = '#a52f48';
+    } else {
+      otherPersonStatus.textContent =
+        'This person appears to be available ♡';
+      otherPersonStatus.style.color = '#4d7049';
+    }
+  } catch (error) {
+    console.error(error);
+    otherPersonStatus.textContent =
+      'Could not check availability. Try again.';
+  }
+}
+
+function openReservation(name, fandom, other = false) {
+  isOtherReservation = other;
+
+  reservationForm.reset();
+
+  selectedCharacter.value = name || '';
+  document.getElementById('dialogTitle').textContent =
+    other ? 'Reserve a western face ♡' : `Reserve ${name} ♡`;
+
+  otherFields.hidden = !other;
+  otherInput.required = other;
+
+  otherPersonStatus.textContent = '';
   feedback.textContent = '';
-  otherStatus.textContent = '';
 
-  document.getElementById('reserveForm').reset();
+  document.getElementById('normalFields').hidden = other;
 
   dialog.showModal();
 }
 
-/* BOTÓN DE CARITAS OCCIDENTALES */
-
-document
-  .getElementById('reserveOtherButton')
+document.getElementById('reserveOtherButton')
   .addEventListener('click', () => {
-    openReservation('other', true);
+    openReservation('', '', true);
   });
 
-/* COMPROBAR DISPONIBILIDAD DE CARITAS OCCIDENTALES */
+document.getElementById('closeDialog')
+  .addEventListener('click', () => {
+    dialog.close();
+  });
 
-otherInput.addEventListener('input', async () => {
-  const name = otherInput.value.trim();
+otherInput.addEventListener('input', checkOtherPerson);
 
-  otherStatus.textContent = '';
+reservationForm.addEventListener('submit', async event => {
+  event.preventDefault();
 
-  if (name.length < 2) return;
+  const submitButton = document.getElementById('submitReservation');
+
+  submitButton.disabled = true;
+  feedback.textContent = 'Checking availability...';
+
+  const nickname = nicknameInput.value.trim();
+  const contact = contactInput.value.trim();
 
   try {
-    await fetchReservations();
+    if (isOtherReservation) {
+      const personName = otherInput.value.trim();
 
-    if (isNameTaken(name)) {
-      otherStatus.textContent =
-        'Este nombre ya está reservado o registrado. ♡';
-
-      otherStatus.style.color = '#a52f48';
-    } else {
-      otherStatus.textContent =
-        '¡Este nombre parece estar disponible! ♡';
-
-      otherStatus.style.color = '#4d7049';
-    }
-
-  } catch (error) {
-    console.error(error);
-
-    otherStatus.textContent =
-      'No se pudo comprobar la disponibilidad.';
-  }
-});
-
-/* CANCELAR */
-
-document.getElementById('cancelBtn').addEventListener('click', () => {
-  dialog.close();
-});
-
-/* ENVIAR RESERVA */
-
-document.getElementById('reserveForm').addEventListener(
-  'submit',
-  async event => {
-
-    event.preventDefault();
-
-    if (isSubmitting) return;
-
-    const nickname = document
-      .getElementById('nickname')
-      .value.trim();
-
-    const contactNumber = document
-      .getElementById('Number')
-      .value.trim();
-
-    const isOther = !otherField.hidden;
-
-    const personName = isOther
-      ? otherInput.value.trim()
-      : selectedCharacter;
-
-    if (!nickname || !contactNumber || !personName) {
-      feedback.textContent = 'Completá todos los campos.';
-      return;
-    }
-
-    if (isOther && personName.length < 2) {
-      feedback.textContent = 'Ingresá un nombre válido.';
-      return;
-    }
-
-    isSubmitting = true;
-    submitButton.disabled = true;
-    submitButton.textContent = 'ENVIANDO...';
-
-    feedback.textContent = '';
-
-    try {
-
-      /* ACTUALIZAR DATOS ANTES DE GUARDAR */
-
-      await fetchReservations();
-
-      /* EVITAR RESERVAS DUPLICADAS */
-
-      if (isNameTaken(personName)) {
-        feedback.textContent =
-          'Este personaje ya está reservado u ocupado.';
-
-        await renderCards();
+      if (!personName) {
+        feedback.textContent = 'Please enter a name.';
         return;
       }
 
-      let result;
+      const { data, error } = await db
+        .from('other_reservations')
+        .select('person_name');
 
-      if (isOther) {
+      if (error) throw error;
 
-        /* GUARDAR CARITAS OCCIDENTALES */
+      const alreadyTaken = (data || []).some(item =>
+        namesMatch(personName, item.person_name)
+      );
 
-        result = await supabaseClient
-          .from('other_reservations')
-          .insert([
-            {
-              person_name: personName
-            }
-          ]);
-
-      } else {
-
-        /* BUSCAR EL GRUPO DEL PERSONAJE */
-
-        const characterGroup = Object.entries(groups)
-          .find(([group, members]) =>
-            group && members.includes(personName)
-          );
-
-        if (!characterGroup) {
-          throw new Error('No se encontró el grupo del personaje.');
-        }
-
-        /* GUARDAR RESERVA DE IDOL */
-
-        result = await supabaseClient
-          .from('idol_reservations')
-          .insert([
-            {
-              character_name: personName,
-              fandom: characterGroup[0],
-              nickname: nickname,
-              contact_number: contactNumber
-            }
-          ]);
+      if (alreadyTaken) {
+        feedback.textContent =
+          'This person is already reserved.';
+        return;
       }
 
-      if (result.error) {
-        throw result.error;
+      const { error: insertError } = await db
+        .from('other_reservations')
+        .insert({
+          person_name: personName
+        });
+
+      if (insertError) throw insertError;
+
+      feedback.textContent = 'Reservation successful! ♡';
+
+    } else {
+      const character = selectedCharacter.value;
+      const fandom = allEntries.find(entry =>
+        entry.name === character
+      )?.fandom || '';
+
+      if (!nickname || !contact) {
+        feedback.textContent =
+          'Please complete all fields.';
+        return;
       }
-
-      feedback.textContent =
-        '¡Tu solicitud fue enviada correctamente! ♡';
-
-      feedback.style.color = '#4d7049';
 
       await fetchReservations();
-      await renderCards();
 
-      setTimeout(() => {
-        dialog.close();
-      }, 1400);
-
-    } catch (error) {
-
-      console.error('Error al guardar reserva:', error);
-
-      feedback.textContent =
-        'No se pudo completar la reserva. Intentá nuevamente.';
-
-      feedback.style.color = '#a52f48';
-
-    } finally {
-
-      isSubmitting = false;
-      submitButton.disabled = false;
-      submitButton.textContent = 'SOLICITAR';
-
-    }
-  }
-);
-
-/* ACTUALIZAR FILTROS */
-
-search.addEventListener('input', renderCards);
-fandom.addEventListener('change', renderCards);
-availability.addEventListener('change', renderCards);
-
-/* NAVEGACIÓN ACTIVA */
-
-const navLinks = document.querySelectorAll('nav a');
-
-const sections = document.querySelectorAll(
-  '#home, #reservations, #rules, #occupied'
-);
-
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      navLinks.forEach(link => {
-        link.classList.toggle(
-          'active',
-          link.getAttribute('href') === `#${entry.target.id}`
+      const alreadyTaken =
+        isNameTaken(character, idolReservations) ||
+        currentOfficialRoles.some(role =>
+          namesMatch(character, role.character_name) &&
+          (
+            !role.fandom ||
+            normalizePersonName(role.fandom) === normalizePersonName(fandom)
+          )
         );
-      });
+
+      if (alreadyTaken) {
+        feedback.textContent =
+          'This character is already occupied.';
+        renderCards();
+        renderOccupied();
+        return;
+      }
+
+      const { error: insertError } = await db
+        .from('idol_reservations')
+        .insert({
+          character_name: character,
+          fandom: fandom,
+          nickname: nickname,
+          contact_number: contact
+        });
+
+      if (insertError) throw insertError;
+
+      feedback.textContent = 'Reservation successful! ♡';
     }
-  });
-}, {
-  threshold: 0.25
+
+    await refreshData();
+
+    setTimeout(() => {
+      dialog.close();
+      reservationForm.reset();
+      otherFields.hidden = true;
+      document.getElementById('normalFields').hidden = false;
+      isOtherReservation = false;
+    }, 1200);
+
+  } catch (error) {
+    console.error('Reservation error:', error);
+
+    feedback.textContent =
+      'Something went wrong. Please try again.';
+  } finally {
+    submitButton.disabled = false;
+  }
 });
 
-sections.forEach(section => observer.observe(section));
+searchInput.addEventListener('input', renderCards);
+groupFilter.addEventListener('change', renderCards);
+statusFilter.addEventListener('change', renderCards);
 
-/* INICIAR PÁGINA */
+document.querySelectorAll('nav a').forEach(link => {
+  link.addEventListener('click', () => {
+    document.querySelectorAll('nav a').forEach(item =>
+      item.classList.remove('active')
+    );
 
-renderCards();
+    link.classList.add('active');
+  });
+});
+
+allEntries = buildEntries();
+
+fillGroupFilter();
+refreshData();
 </script>
-
 </body>
 </html>
 
-      
