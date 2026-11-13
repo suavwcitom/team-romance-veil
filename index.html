@@ -1091,8 +1091,11 @@ document.getElementById('reserveForm')
         }
 
         const result = await supabaseClient
-          .from('other_reservations')
-          .insert([{ person_name: personName }]);
+     .from('other_reservations')
+.insert([{
+  person_name: personName,
+  contact_number: contactNumber
+}]);
 
         if (result.error) throw result.error;
       }
